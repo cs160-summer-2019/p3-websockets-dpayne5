@@ -21,6 +21,102 @@
     <canvas id="myCanvas" width="750px" height="750px"></canvas>
 </body>
 <script>
+  var canvas = document.getElementById('myCanvas');
+  paper.setup(canvas);
+  var tool = new paper.Tool();
+  
+  paper.view.draw();
+  
+  // getting the URL (you may want to use for Exercise 3)
+    var url = window.location.href;
+  
+  
+  //testing items to see how to get the legos to work
+  
+  
+  //creating items 2 rectangles, basic shapes in paperJS must be made as path items, eg paper.Path.Rectangle(....)
+  var pointA = new paper.Point(200,100);
+  var pointB = new paper.Point(300,300); 
+  var sizeTEST = new paper.Size(200,100);
+  var rect1 = new paper.Path.Rectangle(pointA, sizeTEST);
+  var rect2 = new paper.Path.Rectangle(pointB, sizeTEST);
+  rect2.fillColor = 'blue';
+  rect1.fillColor = 'red';
+  
+  //adding them to an array, all legos will pushed to a global array on intialization
+  var testArray = [rect1, rect2];
+  
+  
+  //empty variable, will get assigned to on click.
+  var currentSelection = new paper.Path();
+  console.log(currentSelection);
+  
+  paper.view.draw();
+  
+  
+  
+  var segment, path;
+  var movePath = false;
+  
+  var hitOptions = {
+	segments: true,
+	stroke: true,
+	fill: true,
+	tolerance: 5
+  };
+  
+  
+  //picks up any paper path item it clicks on;
+  tool.onMouseDown = function(event) {
+    
+    segment = path = null;
+    var hitResult = paper.project.hitTest(event.point, hitOptions);
+    
+    if (!hitResult) {
+      return;
+    }
+    
+    if (event.modifiers.shift) {
+      if (hitResult.type == 'segment') {
+        hitResult.segment.remove();
+      }
+    }
+    
+    if (hitResult) {
+		path = hitResult.item;
+		if (hitResult.type == 'segment') {
+			segment = hitResult.segment;
+		} else if (hitResult.type == 'stroke') {
+			var location = hitResult.location;
+			segment = path.insert(location.index + 1, event.point);
+			path.smooth();
+		}
+	}
+    
+    if (hitResult) {
+      path = hitResult.item;
+      if (hitResult.type == 'segment') {
+        segment = hitResult.segment;
+      }
+      else if (hitResult.type == 'stoke') { //this should be the hit result.segment deal
+        var location = hitResult.location;
+        segment = path.insert(location.index+1, event.point);
+        path.smooth();
+      }
+      
+      movePath = hitResult.type == 'fill';
+      if (movePath) {
+        project.activeLayer.addChild(hitResult.item);
+      }
+    }
+    
+    
+    
+    
+    console.log(hitResult.type);
+    
+   
+  }
   
   
   
