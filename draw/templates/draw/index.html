@@ -13,12 +13,39 @@
   
 
     <style type="text/css">
+      
+      /* Body element, flex display, justify content center, to center all following content*/
+      body {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        
+        
+      }
+      #myCanvas {
+        border: 2px solid black;
+        height: 700px;
+        width: 95%;
+        margin-left: 30px;
+      }
+      
+      /* This will be the bar to choose legos to drop onto the screen. */
+      .legoBAR {
+        margin-top: 20px;
+        border: 2px solid blue;
+        width: 95%;
+        height:200px;
+        margin-left: 30px;
+      }
     </style>
 
 </head>
 <body>
     <!-- You may change the dimensions of this canvas -->
-    <canvas id="myCanvas" width="750px" height="750px"></canvas>
+    <canvas id="myCanvas"></canvas>
+  <div class="legoBAR">
+    
+  </div>
 </body>
 <script>
   var canvas = document.getElementById('myCanvas');
