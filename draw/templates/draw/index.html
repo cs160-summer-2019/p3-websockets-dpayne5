@@ -60,14 +60,12 @@
   <!-- The "toolbar" which holds the different types of legos, div classes currently have placeholders,
         they will have buttons eventually which create new paper objects maybe in the bottom corner, and an undo button-->
   <div class="legoBAR">
-    <div class="legoItem">A</div>
-    <div class="legoItem">B</div>
-    <div class="legoItem">C</div>
-    <div class="legoItem">D</div>
-    <div class="legoItem">E</div>
-    <div class="legoItem">E</div>
-    <div class="legoItem">E</div>
-    <div class="legoItem">E</div>
+    <div class="legoItem">LargePiece</div>
+    <div class="legoItem">MidPiece</div>
+    <div class="legoItem">SmallPiece</div>
+    <div class="legoItem">LargeSquare</div>
+    <div class="legoItem">SmallSquare</div>
+    <div class="legoItem">Undo</div>
     
   </div>
 </body>
@@ -86,16 +84,55 @@
   
   
   //creating items 2 rectangles, basic shapes in paperJS must be made as path items, eg paper.Path.Rectangle(....)
+  
+  /*
   var pointA = new paper.Point(200,100);
   var pointB = new paper.Point(300,300); 
   var sizeTEST = new paper.Size(200,100);
   var rect1 = new paper.Path.Rectangle(pointA, sizeTEST);
   var rect2 = new paper.Path.Rectangle(pointB, sizeTEST);
-  rect2.fillColor = 'blue';
-  rect1.fillColor = 'red';
+  */
+  
+  
+  
+  //Pieces to use, 
+  var longPiece = new paper.Path.Rectangle(new paper.Point(200,300), new paper.Size(400,50));
+  var midPiece = new paper.Path.Rectangle(new paper.Point(200,100), new paper.Size(200,50));
+  var shortPiece = new paper.Path.Rectangle(new paper.Point(200,200), new paper.Size(100,50));
+  var largeSquare = new paper.Path.Rectangle(new paper.Point(400,400), new paper.Size(200,200));
+  var smallSquare = new paper.Path.Rectangle(new paper.Point(500,400), new paper.Size(200,200));
+  
+  
+  //commented out below is an attempt at a half circle/cap. Going to come back to it.
+  /* 
+  
+  var startPointArcOne = new paper.Point(100,100);
+  var endPointArcOne = new paper.Point(0,100);
+  var midPointArcOne = new paper.Point(40,50);
+  
+  var arcRight = new paper.Path.Arc(startPointArcOne, midPointArcOne, endPointArcOne);
+  arcRight.fillColor = 'black';
+  
+  */
+  
+  
+  
+  
+  
+  
+  
+  //differentiating colors to tell objects apart
+  
+  longPiece.fillColor = 'red';
+  midPiece.fillColor = 'blue';
+  shortPiece.fillColor = 'black';
+  largeSquare.fillColor = 'orange';
+  smallSquare.fillColor = 'magenta';
   
   //adding them to an array, all legos will pushed to a global array on intialization
-  var testArray = [rect1, rect2];
+  //var testArray = [loing];
+  
+  //hardcoded more lego items, to go along with rect 1 and rect 2
   
   
   //empty variable, will get assigned to on click.
