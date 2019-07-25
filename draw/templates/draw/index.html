@@ -106,17 +106,37 @@
       
       movePath = hitResult.type == 'fill';
       if (movePath) {
-        project.activeLayer.addChild(hitResult.item);
+        paper.project.activeLayer.addChild(hitResult.item);
       }
-    }
-    
-    
-    
-    
+    }  
     console.log(hitResult.type);
-    
-   
   }
+  
+  
+  /*
+  tool.onMouseMove = function(event) {
+    paper.project.activeLayer.selected = false;
+    if (event.item) {
+      event.item.selected = true;
+    }
+  }
+  */
+  
+  
+  
+  tool.onMouseDrag = function(event) {
+    if (segment) {
+      segment.point += event.delta;
+      path.smooth();
+    }
+    else if (path) {
+      //transform deal here
+      path.position = event.point;
+    }
+  }
+  
+
+
   
   
   
