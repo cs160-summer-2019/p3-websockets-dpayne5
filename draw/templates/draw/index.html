@@ -154,6 +154,22 @@
   //this is to combine two shapes together
   //  result = square[operation](ring);
   function makeMouseDownSocketArray(event) {
+    
+    var test = "-1";
+    test += event.point.toString();
+    test += event.modifiers.shift.toString;
+    test += event.item.toString();
+    
+    console.log(test);
+    
+    var b = JSON.stringify(test);
+    console.log(b);
+    var c = JSON.parse(test);
+    
+    console.log(c);
+    
+    
+    
     var flag = [-1];
     flag.push(event.point.x);
     flag.push(event.point.y);
@@ -163,6 +179,7 @@
     flag.push(path);
     flag.push(movePath);
     flag.push(allLEGOS);
+    flag.push(event.item); //this is s[9]
     
     return flag;
     
@@ -200,6 +217,7 @@
     console.log("parsing the info from new function");
     console.log(s);
     
+    
     var x = parseInt(s[1]);
     var y = parseInt(s[2]);
     
@@ -218,11 +236,7 @@
         var newLP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(400,50));
         newLP.fillColor = 'black';
         allLEGOS.push(newLP);
-        //s[3].push(newLP);
         
-        //return newLP;
-        //now a new problem, we can return; but returning gives us a null item for some reason
-        //NEED to get the items in allLEGOS somehow
         break;
       case 2:
         //do stuff
@@ -266,60 +280,7 @@
         
         
       case -1:
-        //I wonder if we have to do things INSIDE of this function for scoping issues?
-        //trying something here, to see if scoping is the issue, although I doubt it.
-        
-        //we know that s[8] contains items, which is good
-        segment = path = null;
-    
-        //********** BIG STICKING POINT, ~6 HOURS NOW
-    var hitResult = paper.project.hitTest(s[3], hitOptions);
-    //before was event.point
-    
-    if (!hitResult) {
-      console.log("nothing hit");
-      return [null, null, false];
-    }
-    if (s[4]) { //before was event.modifiers
-      if (hitResult.type == 'segment') {
-        hitResult.segment.remove();
-      }
-    }
-    
-    if (hitResult) {
-      console.log("HIT RESULT DATA");
-      console.log(hitResult.item);
-		path = hitResult.item;
-      console.log("AFTER PATH GETS ASSIGNED TO");
-      console.log(path)
-		if (hitResult.type == 'segment') {
-			segment = hitResult.segment;
-		} else if (hitResult.type == 'stroke') {
-			var location = hitResult.location;
-			segment = path.insert(location.index + 1, eventpoint);  //before was event.point
-			path.smooth();
-		}
-	}
-    
-    if (hitResult) {
-      path = hitResult.item;
-      if (hitResult.type == 'segment') {
-        segment = hitResult.segment;
-      }
-      else if (hitResult.type == 'stoke') { //this should be the hit result.segment deal
-        var location = hitResult.location;
-        segment = path.insert(location.index+1, eventpoint); //before wa event.point
-        path.smooth();
-      }
-      
-      movePath = hitResult.type == 'fill';
-      if (movePath) {
-        paper.project.activeLayer.addChild(hitResult.item);
-      }
-    } 
-    paper.view.draw();
-    
-    //need to return [segment, path, movepath]
+        socketMOUSEDOWN(s[3], s[4], s[5], s[6], s[7], s[8], s[9]);
         
         break;
       case -2:
@@ -352,12 +313,16 @@
   
   //rolling mouseDown into one function, for websocket
   //needs to return segment, path, and movepath
-  function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath, allLEGOS) {
+  function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath, allLEGOS, eventItem) {
     segment = path = null;
+    console.log(eventItem[1]);
     
     
-    var hitResult = paper.project.hitTest(eventpoint, hitOptions);
+    console.log(paper.project.isEmpty());
+    
+    //var hitResult = paper.project.hitTest(eventpoint, hitOptions);
     //before was event.point
+    var hitResult = eventItem[1];
     
     if (!hitResult) {
       console.log("nothing hit");
@@ -411,6 +376,10 @@
   
   tool.onMouseDown = function(event) {
     var s = event;
+    console.log("on mousedown checking event.item");
+    console.log(event.item);
+    
+    //lets try passing this event.item
 
     socket.send(JSON.stringify(makeMouseDownSocketArray(s)));
 
