@@ -137,17 +137,30 @@
   
   paper.view.draw();
   
+  var segment, path;
+  var movePath = false;
+  
   // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
   
-  //going to consolidate some of this stuff, rolling all the flag.push crap into a single function
   
   function makeFlagArray(index) {
     var flag = [index];
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
     flag.push(allLEGOS);
+    return flag;
     
+  }
+  
+  function makeMouseDownSocketArray(event) {
+    var flag = [-1];
+    flag.push(event.point.x);
+    flag.push(event.point.y);
+    flag.push(event);
+    flag.push(segment);
+    flag.push(path);
+    flag.push(movePath);
     
     return flag;
     
@@ -177,19 +190,7 @@
   function undo() {
     socket.send(JSON.stringify(makeFlagArray(6))); 
   }
-  
-  
-  /*
-  //Pieces to use, assign these to an array later, or should add all these sizes to a dictionary
-  var longPiece = new paper.Path.Rectangle(new paper.Point(200,300), new paper.Size(400,50));
-  var midPiece = new paper.Path.Rectangle(new paper.Point(200,100), new paper.Size(200,50));
-  var shortPiece = new paper.Path.Rectangle(new paper.Point(200,200), new paper.Size(100,50));
-  var largeSquare = new paper.Path.Rectangle(new paper.Point(400,400), new paper.Size(200,200));
-  var smallSquare = new paper.Path.Rectangle(new paper.Point(500,400), new paper.Size(200,200));
-  */
-  
-  
-  
+ 
   //socket function, intended to be VERY large. Has switch cases for just about everything
   socket.onmessage = function(data) {
     
@@ -199,6 +200,16 @@
     
     var x = parseInt(s[1]);
     var y = parseInt(s[2]);
+    
+    //generate random colors 
+    function getRandomColor() {
+      var options = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += options[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
     
     switch (parseInt(s[0])) {
       case 1:
@@ -233,7 +244,7 @@
         newSS.fillColor = 'black';
         break;
       case 6:
-        
+        // *** currently the undo button does NOT work
         //do stuff
         //console.log("undo works");
         //allLEGOS[allLEGOS.length -1].fillColor = 'white';
@@ -241,9 +252,19 @@
         var toDelete = s[3].pop();
         var toDelete = new paper.Path;
         
-        console.log(toDelete);
         
         break;
+        
+        
+      case -1:
+        //here we do things for mouseDown
+        [s[4],s[5],s[6]] = socketMOUSEDOWN([s[3],s[4],s[5],s[6]]);
+
+        break;
+      case -2:
+        //here we do things for mouseDrag
+        break;
+        
       default:
         console.log("nothing happened");
         
@@ -253,42 +274,11 @@
   }
   
   
-  
-  //commented out below is an attempt at a half circle/cap. Going to come back to it.
-  /* 
-  
-  var startPointArcOne = new paper.Point(100,100);
-  var endPointArcOne = new paper.Point(0,100);
-  var midPointArcOne = new paper.Point(40,50);
-  
-  var arcRight = new paper.Path.Arc(startPointArcOne, midPointArcOne, endPointArcOne);
-  arcRight.fillColor = 'black';
-  
-  */
-  
-  //differentiating colors to tell objects apart
-  /*
-  longPiece.fillColor = 'red';
-  midPiece.fillColor = 'blue';
-  shortPiece.fillColor = 'black';
-  largeSquare.fillColor = 'orange';
-  smallSquare.fillColor = 'magenta';
-  */
-  
-  //adding them to an array, all legos will pushed to a global array on intialization
-  //var testArray = [loing];
-  
-  //hardcoded more lego items, to go along with rect 1 and rect 2
-  
-  
-  //empty variable, will get assigned to on click.
-  var currentSelection = new paper.Path();
-  console.log(currentSelection);
-  
   paper.view.draw();
   //variables for movement abilities
-  var segment, path;
-  var movePath = false;
+  
+  
+  
   var hitOptions = {
 	segments: true,
 	stroke: true,
@@ -297,12 +287,75 @@
   };
   
   
-  //picks up any paper path item it clicks on;
+  //rolling mouseDown into one function, for websocket
+  //needs to return segment, path, and movepath
+  function socketMOUSEDOWN(event,segment, path, movePath) {
+    segment = path = null;
+    
+    var hitResult = paper.project.hitTest(event.point, hitOptions);
+    
+    if (!hitResult) {
+      return [null, null, false];
+    }
+    
+    if (event.modifiers.shift) {
+      if (hitResult.type == 'segment') {
+        hitResult.segment.remove();
+      }
+    }
+    
+    if (hitResult) {
+		path = hitResult.item;
+		if (hitResult.type == 'segment') {
+			segment = hitResult.segment;
+		} else if (hitResult.type == 'stroke') {
+			var location = hitResult.location;
+			segment = path.insert(location.index + 1, event.point);
+			path.smooth();
+		}
+	}
+    
+    if (hitResult) {
+      path = hitResult.item;
+      if (hitResult.type == 'segment') {
+        segment = hitResult.segment;
+      }
+      else if (hitResult.type == 'stoke') { //this should be the hit result.segment deal
+        var location = hitResult.location;
+        segment = path.insert(location.index+1, event.point);
+        path.smooth();
+      }
+      
+      movePath = hitResult.type == 'fill';
+      if (movePath) {
+        paper.project.activeLayer.addChild(hitResult.item);
+      }
+    } 
+    
+    //need to return [segment, path, movepath]
+    return [segment, path, movePath];
+  }
+  
+  
+  
   tool.onMouseDown = function(event) {
     
+    //make [-1, event, segment, path, movePath] into JSON to pass to socketsend
+    
+    var s = event;
+    //console.log("looking at returned pieces now for makeMOuse");
+    
+    console.log(makeMouseDownSocketArray(s));
+    
+    //socket.send(JSON.stringify(makeMouseDownSocketArray(event)));
     
     
+    //Below is the original, which works only in your current browser!
+    
+    /*
     segment = path = null;
+    
+    
     var hitResult = paper.project.hitTest(event.point, hitOptions);
     
     if (!hitResult) {
@@ -341,8 +394,8 @@
       if (movePath) {
         paper.project.activeLayer.addChild(hitResult.item);
       }
-    }  
-    console.log(hitResult.type);
+    } 
+    */
   }
   
   
