@@ -23,7 +23,6 @@
         
       }
       #myCanvas {
-        border: 2px solid black;
         height: 700px;
         width: 95%;
         margin: 0 auto;
@@ -49,14 +48,13 @@
         color: gold;
         flex-direction: column;
         justify-content: space-between;
-        border: 2px solid purple;
         
         
       }
       
       .buttonContainer {
-        border: 2px solid red;
         margin: 0 auto;
+        margin-bottom: 20px;
         
         width: 95%;
         display: flex;
@@ -67,48 +65,12 @@
       
       .imageContainer {
         border: 2px solid green;
-        margin-left: 80px;
+        margin-left: 30px;
         width: 80%;
         display: flex;
         margin-top: 10px;
-        justify-content: space-between;
+        justify-content: space-evenly;
       }
-      
-      .imageForClick {
-        background-color: black;
-        color: white;
-      }
-      
-      .largeImage {
-        width:175px;
-        height: 30px;
-      }
-      
-      .mediumImage {
-        width: 125px;
-        height: 30px;
-      }
-      
-      .smallImage {
-        width: 75px;
-        height:30px;
-        
-      }
-      
-      .largeSimage {
-        height: 100px;
-        width: 100px;
-        
-      }
-      
-      .smallSimage {
-        height:50px;
-        width: 50px;
-        
-      }
-      
-      
-      
       
       
     </style>
@@ -137,11 +99,14 @@
     <button onclick="createSmallSquare()" class="largepiece">
          Small Square
       </button>
+    
+    <!--
     <button onclick="undo()">
          Undo
-      </button>
+      </button> -->
     
   </div>
+  <!--  ** Scrapping for now, not lining up visually and spending too much time on this **
   <div class="imageContainer">
     
     
@@ -154,37 +119,15 @@
     
     
   </div>
+  -->
   
 </body>
 <script>
   
-  
-  function createLargePiece() {
-    console.log("bobby");
-  }
-  
-  
-  function createSmallPiece() {
-    //socket send here
-  }
-  
-  function createMidPiece() {
-    //
-  }
-  
-  function createLargeSquare() {
-    //
-  }
-  
-  function createSmallSquare() {
-    
-  }
-  
-  function undo() {
-    //delete last block made
-  }
-  
+  var allLEGOS = [];
   var canvas = document.getElementById('myCanvas');
+  var socket = new WebSocket('wss://p3-websockets-dpayne5-dpayne589733.codeanyapp.com/ws/draw');
+
   paper.setup(canvas);
   var tool = new paper.Tool();
   
@@ -194,27 +137,149 @@
     var url = window.location.href;
   
   
-  //testing items to see how to get the legos to work
+  function createLargePiece() {
+    //first piece of data sent to socket message, ie case data[0] = 1, do etc....
+    var flag = [1];
+    //need to get the data of the pieces here, the event point coordinates and flag the socket to create
+    //the piece at the coordinates
+    flag.push(event.clientX);
+    flag.push(event.clientY - 100);
+    flag.push(allLEGOS);
+    
+    console.log(JSON.stringify(flag));
+    
+    //var s = flag.toString();
+    socket.send(JSON.stringify(flag));
+    
+  }
   
   
-  //creating items 2 rectangles, basic shapes in paperJS must be made as path items, eg paper.Path.Rectangle(....)
+  function createSmallPiece() {
+    //socket send here
+    var flag = [2]
+    flag.push(event.clientX);
+    flag.push(event.clientY - 100);
+    //need to push their color as well
+    flag.push(allLEGOS);
+    socket.send(JSON.stringify(flag));
+    
+    
+    
+  }
+  
+  function createMidPiece() {
+    var flag = [3];
+    flag.push(event.clientX);
+    flag.push(event.clientY - 100);
+    flag.push(allLEGOS);
+    socket.send(JSON.stringify(flag));
+    //
+  }
+  
+  function createLargeSquare() {
+    var flag = [4];
+    flag.push(event.clientX);
+    flag.push(event.clientY - 100);
+    flag.push(allLEGOS);
+    socket.send(JSON.stringify(flag));
+    //
+  }
+  
+  function createSmallSquare() {
+    var flag = [5];
+    flag.push(event.clientX);
+    flag.push(event.clientY - 100);
+    flag.push(allLEGOS);
+    socket.send(JSON.stringify(flag));
+    
+    
+  }
+  
+  function undo() {
+    var flag = [6];
+    var s = flag.toString();
+    //just sent to make the switdch statements less bulky
+    flag.push(event.clientX);
+    flag.push(event.clientY - 100);
+    flag.push(allLEGOS);
+    socket.send(JSON.stringify(flag));
+    
+    //delete last block made
+  }
+  
   
   /*
-  var pointA = new paper.Point(200,100);
-  var pointB = new paper.Point(300,300); 
-  var sizeTEST = new paper.Size(200,100);
-  var rect1 = new paper.Path.Rectangle(pointA, sizeTEST);
-  var rect2 = new paper.Path.Rectangle(pointB, sizeTEST);
-  */
-  
-  
-  
-  //Pieces to use, 
+  //Pieces to use, assign these to an array later, or should add all these sizes to a dictionary
   var longPiece = new paper.Path.Rectangle(new paper.Point(200,300), new paper.Size(400,50));
   var midPiece = new paper.Path.Rectangle(new paper.Point(200,100), new paper.Size(200,50));
   var shortPiece = new paper.Path.Rectangle(new paper.Point(200,200), new paper.Size(100,50));
   var largeSquare = new paper.Path.Rectangle(new paper.Point(400,400), new paper.Size(200,200));
   var smallSquare = new paper.Path.Rectangle(new paper.Point(500,400), new paper.Size(200,200));
+  */
+  
+  
+  
+  //socket function, intended to be VERY large. Has switch cases for just about everything
+  socket.onmessage = function(data) {
+    
+    var s = JSON.parse(data.data);
+    console.log(s);
+    
+    var x = parseInt(s[1]);
+    var y = parseInt(s[2]);
+    
+    switch (parseInt(s[0])) {
+      case 1:
+        var newLP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(400,50));
+        newLP.fillColor = 'black';
+        s[3].push(newLP);
+        console.log("looking at the items of s[3] now");
+        console.log(s[3]);
+        break;
+      case 2:
+        //do stuff
+        var newMP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,50));
+        newMP.fillColor = 'black';
+        s[3].push(newMP);
+        break;
+      case 3:
+        //do stuff
+        var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
+        newSP.fillColor = 'black';
+        s[3].push(newMP);
+        break;
+      case 4:
+        //do stuff
+        var newLS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,200));
+        s[3].push(newLS);
+        newLS.fillColor = 'black';
+        break;
+      case 5:
+        //do stuff
+        var newSS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,100));
+        s[3].push(newSS);
+        newSS.fillColor = 'black';
+        break;
+      case 6:
+        
+        //do stuff
+        //console.log("undo works");
+        //allLEGOS[allLEGOS.length -1].fillColor = 'white';
+        s[3][s[3].length -1].fillColor = 'white';
+        var toDelete = s[3].pop();
+        var toDelete = new paper.Path;
+        
+        console.log(toDelete);
+        
+        break;
+      default:
+        console.log("nothing happened");
+        
+        
+    }
+    
+  }
+  
   
   
   //commented out below is an attempt at a half circle/cap. Going to come back to it.
@@ -229,19 +294,14 @@
   
   */
   
-  
-  
-  
-  
-  
-  
   //differentiating colors to tell objects apart
-  
+  /*
   longPiece.fillColor = 'red';
   midPiece.fillColor = 'blue';
   shortPiece.fillColor = 'black';
   largeSquare.fillColor = 'orange';
   smallSquare.fillColor = 'magenta';
+  */
   
   //adding them to an array, all legos will pushed to a global array on intialization
   //var testArray = [loing];
@@ -254,12 +314,9 @@
   console.log(currentSelection);
   
   paper.view.draw();
-  
-  
-  
+  //variables for movement abilities
   var segment, path;
   var movePath = false;
-  
   var hitOptions = {
 	segments: true,
 	stroke: true,
@@ -270,6 +327,8 @@
   
   //picks up any paper path item it clicks on;
   tool.onMouseDown = function(event) {
+    
+    
     
     segment = path = null;
     var hitResult = paper.project.hitTest(event.point, hitOptions);
@@ -326,13 +385,7 @@
     }
   }
   
-
-
-  
-  
-  
-  
-  
+  //old work from p3 implementations
   /*
 
     // setting up the canvas and one paper tool
