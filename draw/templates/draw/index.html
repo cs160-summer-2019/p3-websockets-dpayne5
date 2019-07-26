@@ -286,27 +286,28 @@
       case -2:
         //here we do things for mouseDrag
         console.log("in the socketMOUSEDRAG");
+        console.log(s);
         
         
         //ok, these two lines are good. A new point is made, nothing special, now need the path
         var b = new paper.Point(s[2][1], s[2][2]);
+        
         console.log(b);
         
         
+        var ID = s[1]
+        //console.log("THE ID IN THE SOCKET SHOULD BE 1::::, ", id);
         
+        var newpath = paper.project.getItems({
+        id: ID
         
+      });
         
-        //path.position = event.point;
-        console.log("PATH IS");
-        console.log(s[1][1]); //this is the path array here, how do we make it an item?
-        //console.log(JSON.parse(s[1][1]));
-        console.log("POINT IS");
-        console.log(s[2]);
-        s[1][1].position = new paper.Point(s[2][1], s[2][2]);
+        console.log(newpath);
         
+        path.position = b;
         
-        
-        
+        newpath.position = b;
         
         
         
@@ -550,9 +551,9 @@
   }
   
   
-  function makeMouseDragTwo(eventPoint, path) {
+  function makeMouseDragTwo(eventPoint, id) {
     var flag = [-2];
-    flag.push(path);
+    flag.push(id);
     flag.push(eventPoint);
     socket.send(JSON.stringify(flag));
   }
@@ -594,7 +595,7 @@
       //console.log("printing exportJSON of path");
       //console.log(e);
       
-      makeMouseDragTwo(event.point, path);
+      makeMouseDragTwo(event.point, path.id);
       
       //makeMouseDragTwo(event.point, path);
       //path.position = event.point;
