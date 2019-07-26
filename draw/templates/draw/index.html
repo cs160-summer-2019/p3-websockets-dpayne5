@@ -288,13 +288,28 @@
         console.log("in the socketMOUSEDRAG");
         
         
+        //ok, these two lines are good. A new point is made, nothing special, now need the path
+        var b = new paper.Point(s[2][1], s[2][2]);
+        console.log(b);
+        
+        
+        
+        
+        
+        //path.position = event.point;
+        console.log("PATH IS");
+        console.log(s[1][1]); //this is the path array here, how do we make it an item?
+        //console.log(JSON.parse(s[1][1]));
+        console.log("POINT IS");
+        console.log(s[2]);
+        s[1][1].position = new paper.Point(s[2][1], s[2][2]);
         
         
         
         
         
         
-        socketMOUSEDRAG(s[4], s[3], s[5], s[6]);
+        
         break;
         
       default:
@@ -534,6 +549,14 @@
     
   }
   
+  
+  function makeMouseDragTwo(eventPoint, path) {
+    var flag = [-2];
+    flag.push(path);
+    flag.push(eventPoint);
+    socket.send(JSON.stringify(flag));
+  }
+  
   //
   tool.onMouseDrag = function(event) {
     
@@ -541,23 +564,40 @@
     //socket.send(s);
     
     
-    //idea, do the majority of the work here, then send somehow, the movement to the bullshit socket
-    
-    //I BELIEVE THIS ONE CAN BE SENT OVER THE WAY I HAVE IT, WILL CHECK LATER
-    
-    
-    
     //below this line is old, working code for one browser window only
     
-    console.log(segment);
-    console.log(path);
     
     if (segment) {
       segment.point += event.delta;
       path.smooth();
     }
     else if (path) {
-      path.position = event.point;
+      
+      console.log("*********"); //might be the key!
+      console.log(path.id);
+      
+      var z = paper.project.getItems({
+        id: 1
+        
+      });
+      
+      
+      console.log("THIS COULD BE IT BOUYS");
+      console.log(z);
+      
+      //here we flag, and go to move the point in whatever.here
+      var d = JSON.stringify(path);
+      //console.log(d);
+      
+      var f = JSON.stringify(event.point);
+      var e = path.exportJSON();
+      //console.log("printing exportJSON of path");
+      //console.log(e);
+      
+      makeMouseDragTwo(event.point, path);
+      
+      //makeMouseDragTwo(event.point, path);
+      //path.position = event.point;
       
       //what if we just send it here? will try after food
     }
