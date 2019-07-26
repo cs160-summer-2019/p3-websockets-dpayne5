@@ -153,12 +153,14 @@
     
   }
   
+  //this is to combine two shapes togethery 
+  //  result = square[operation](ring);
   function makeMouseDownSocketArray(event) {
     var flag = [-1];
     flag.push(event.point.x);
     flag.push(event.point.y);
     flag.push(event.point);
-    flag.push(event.modifiers);
+    flag.push(event.modifiers.shift);
     flag.push(segment);
     flag.push(path);
     flag.push(movePath);
@@ -202,7 +204,7 @@
     var x = parseInt(s[1]);
     var y = parseInt(s[2]);
     
-    //generate random colors 
+    //generate random colors function
     function getRandomColor() {
       var options = '0123456789ABCDEF';
       var color = '#';
@@ -297,20 +299,28 @@
   function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath) {
     segment = path = null;
     
-    var hitResult = paper.project.hitTest(eventpoint, hitOptions); //before was event.point
+    //console.log(paper.project.isEmpty());
+    
+    
+    
+    var hitResult = paper.project.hitTestAll(eventpoint, hitOptions);
+    //before was event.point
     
     if (!hitResult) {
       return [null, null, false];
     }
-    
-    if (modifiers.shift) { //before was event.modifiers
+    if (modifiers) { //before was event.modifiers
       if (hitResult.type == 'segment') {
         hitResult.segment.remove();
       }
     }
     
     if (hitResult) {
+      console.log("HIT RESULT DATA");
+      console.log(hitResult);
 		path = hitResult.item;
+      console.log("AFTER PATH GETS ASSIGNED TO");
+      console.log(path)
 		if (hitResult.type == 'segment') {
 			segment = hitResult.segment;
 		} else if (hitResult.type == 'stroke') {
@@ -336,8 +346,10 @@
         paper.project.activeLayer.addChild(hitResult.item);
       }
     } 
+    paper.view.draw();
     
     //need to return [segment, path, movepath]
+    console.log("BEFORE RETURN<> SEGMENT PATH movePAth: ", segment, path, movePath);
     return [segment, path, movePath];
   }
   
@@ -348,13 +360,9 @@
     //make [-1, event, segment, path, movePath] into JSON to pass to socketsend
     
     var s = event;
-    //console.log("looking at returned pieces now for makeMOuse");
     
-    //console.log(makeMouseDownSocketArray(s));
-    
-    //here the circular error is happening because of the event parameter. Need to find some workaround
-    //can serialize the object, or just pull the relevant information
-    //then need to look at what I need different
+    //the current problem with socket send is hitTest is not recognizing a box. Need to check old code to see if 
+    //test recognizes point, then read docs to see whats going on
     
     socket.send(JSON.stringify(makeMouseDownSocketArray(s)));
     
@@ -366,6 +374,9 @@
     
     
     var hitResult = paper.project.hitTest(event.point, hitOptions);
+    //looking at results of hitResult;
+    //here this is initialize {'fill } etc etc....so this is the problem
+    console.log(hitResult);
     
     if (!hitResult) {
       return;
@@ -405,11 +416,13 @@
       }
     } 
     */
+    
   }
   
   
   
   function socketMOUSEDRAG(eDelta, ePoint, segment, path) {
+    
     
     if (segment) {
       segment.point += eDelta;
@@ -418,6 +431,8 @@
     else if (path) {
       path.position = ePoint;
     }
+    paper.view.draw();
+    
     
   }
   
