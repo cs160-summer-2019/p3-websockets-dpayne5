@@ -286,6 +286,14 @@
       case -2:
         //here we do things for mouseDrag
         console.log("in the socketMOUSEDRAG");
+        
+        
+        
+        
+        
+        
+        
+        
         socketMOUSEDRAG(s[4], s[3], s[5], s[6]);
         break;
         
@@ -381,8 +389,73 @@
     
     //lets try passing this event.item
 
-    socket.send(JSON.stringify(makeMouseDownSocketArray(s)));
+    //socket.send(JSON.stringify(makeMouseDownSocketArray(s)));
+    
+    segment = path = null;
+    
+    
+    var hitResult = paper.project.hitTest(event.point, hitOptions);
+    //looking at results of hitResult;
+    //here this is initialize {'fill } etc etc....so this is the problem
+    console.log(hitResult);
+    
+    if (!hitResult) {
+      return;
+    }
+    
+    
+    if (event.modifiers.shift) {
+      if (hitResult.type == 'segment') {
+        hitResult.segment.remove();
+      }
+    }
+    
+    if (hitResult) {
+		path = hitResult.item;
+		if (hitResult.type == 'segment') {
+			segment = hitResult.segment;
+		} else if (hitResult.type == 'stroke') {
+			var location = hitResult.location;
+			segment = path.insert(location.index + 1, event.point);
+			path.smooth();
+		}
+	}
+    
+    if (hitResult) {
+      path = hitResult.item;
+      if (hitResult.type == 'segment') {
+        segment = hitResult.segment;
+      }
+      else if (hitResult.type == 'stoke') { //this should be the hit result.segment deal
+        var location = hitResult.location;
+        segment = path.insert(location.index+1, event.point);
+        path.smooth();
+      }
+      
+      movePath = hitResult.type == 'fill';
+      if (movePath) {
+        paper.project.activeLayer.addChild(hitResult.item);
+      }
+    } 
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     //Below is the original, which works only in your current browser!
     
     /*
@@ -438,6 +511,7 @@
   
   
   function socketMOUSEDRAG(eDelta, ePoint, segment, path) {
+    console.log(eDelta, ePoint,"segment:::", segment, "path::::",path);
     if (segment) {
       segment.point += eDelta;
       path.smooth();
@@ -463,18 +537,32 @@
   //
   tool.onMouseDrag = function(event) {
     
-    var s = JSON.stringify(makeMouseDragSocketArray(event));
-    socket.send(s);
+   // var s = JSON.stringify(makeMouseDragSocketArray(event));
+    //socket.send(s);
+    
+    
+    //idea, do the majority of the work here, then send somehow, the movement to the bullshit socket
+    
+    //I BELIEVE THIS ONE CAN BE SENT OVER THE WAY I HAVE IT, WILL CHECK LATER
+    
+    
+    
     //below this line is old, working code for one browser window only
-    /*
+    
+    console.log(segment);
+    console.log(path);
+    
     if (segment) {
       segment.point += event.delta;
       path.smooth();
     }
     else if (path) {
       path.position = event.point;
+      
+      //what if we just send it here? will try after food
     }
-    */
+    
+    
   }
   
   //old work from p3 implementations
