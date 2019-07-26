@@ -258,12 +258,16 @@
         
         
       case -1:
+        console.log("in the socketMOUSEDOWN");
         //here we do things for mouseDown
         [s[5],s[6],s[7]] = socketMOUSEDOWN([s[3],s[4],s[5],s[6],s[7]]);
+        console.log("s5 : ", s[5], "s6 : ", s[6], "s[7] : ", s[7]);
 
         break;
       case -2:
         //here we do things for mouseDrag
+        console.log("in the socketMOUSEDRAG");
+        socketMOUSEDRAG(s[4], s[3], s[5], s[6]);
         break;
         
       default:
@@ -404,8 +408,40 @@
   }
   
   
+  
+  function socketMOUSEDRAG(eDelta, ePoint, segment, path) {
+    
+    if (segment) {
+      segment.point += eDelta;
+      path.smooth();
+    }
+    else if (path) {
+      path.position = ePoint;
+    }
+    
+  }
+  
+  function makeMouseDragSocketArray(event) {
+    var flag = [-2];
+    flag.push(event.point.x);
+    flag.push(event.point.y);
+    flag.push(event.point);
+    flag.push(event.delta);
+    flag.push(segment);
+    flag.push(path);
+    
+    
+    return flag;
+    
+  }
+  
   //
   tool.onMouseDrag = function(event) {
+    
+    var s = JSON.stringify(makeMouseDragSocketArray(event));
+    socket.send(s);
+    //below this line is old, working code for one browser window only
+    /*
     if (segment) {
       segment.point += event.delta;
       path.smooth();
@@ -413,6 +449,7 @@
     else if (path) {
       path.position = event.point;
     }
+    */
   }
   
   //old work from p3 implementations
