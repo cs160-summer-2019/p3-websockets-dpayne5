@@ -126,8 +126,6 @@
   
   //*** server is running HERE: http://p3-websockets-dpayne5-dpayne589733.codeanyapp.com:3000/draw/ *********
 
-  //heck yea
-  //nice
   var allLEGOS = [];
   var canvas = document.getElementById('myCanvas');
   var socket = new WebSocket('wss://p3-websockets-dpayne5-dpayne589733.codeanyapp.com/ws/draw');
@@ -153,7 +151,7 @@
     
   }
   
-  //this is to combine two shapes togethery 
+  //this is to combine two shapes together
   //  result = square[operation](ring);
   function makeMouseDownSocketArray(event) {
     var flag = [-1];
@@ -164,6 +162,7 @@
     flag.push(segment);
     flag.push(path);
     flag.push(movePath);
+    flag.push(allLEGOS);
     
     return flag;
     
@@ -218,33 +217,40 @@
       case 1:
         var newLP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(400,50));
         newLP.fillColor = 'black';
-        s[3].push(newLP);
-        console.log("looking at the items of s[3] now");
-        console.log(s[3]);
+        allLEGOS.push(newLP);
+        //s[3].push(newLP);
+        
+        //return newLP;
+        //now a new problem, we can return; but returning gives us a null item for some reason
+        //NEED to get the items in allLEGOS somehow
         break;
       case 2:
         //do stuff
         var newMP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,50));
         newMP.fillColor = 'black';
         s[3].push(newMP);
+        return newMP;
         break;
       case 3:
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
         newSP.fillColor = 'black';
         s[3].push(newMP);
+        return newSP;
         break;
       case 4:
         //do stuff
         var newLS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,200));
         s[3].push(newLS);
         newLS.fillColor = 'black';
+        return newLS;
         break;
       case 5:
         //do stuff
         var newSS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,100));
         s[3].push(newSS);
         newSS.fillColor = 'black';
+        return newSS;
         break;
       case 6:
         // *** currently the undo button does NOT work
@@ -260,11 +266,61 @@
         
         
       case -1:
-        console.log("in the socketMOUSEDOWN");
-        //here we do things for mouseDown
-        [s[5],s[6],s[7]] = socketMOUSEDOWN([s[3],s[4],s[5],s[6],s[7]]);
-        console.log("s5 : ", s[5], "s6 : ", s[6], "s[7] : ", s[7]);
-
+        //I wonder if we have to do things INSIDE of this function for scoping issues?
+        //trying something here, to see if scoping is the issue, although I doubt it.
+        
+        //we know that s[8] contains items, which is good
+        segment = path = null;
+    
+        //********** BIG STICKING POINT, ~6 HOURS NOW
+    var hitResult = paper.project.hitTest(s[3], hitOptions);
+    //before was event.point
+    
+    if (!hitResult) {
+      console.log("nothing hit");
+      return [null, null, false];
+    }
+    if (s[4]) { //before was event.modifiers
+      if (hitResult.type == 'segment') {
+        hitResult.segment.remove();
+      }
+    }
+    
+    if (hitResult) {
+      console.log("HIT RESULT DATA");
+      console.log(hitResult.item);
+		path = hitResult.item;
+      console.log("AFTER PATH GETS ASSIGNED TO");
+      console.log(path)
+		if (hitResult.type == 'segment') {
+			segment = hitResult.segment;
+		} else if (hitResult.type == 'stroke') {
+			var location = hitResult.location;
+			segment = path.insert(location.index + 1, eventpoint);  //before was event.point
+			path.smooth();
+		}
+	}
+    
+    if (hitResult) {
+      path = hitResult.item;
+      if (hitResult.type == 'segment') {
+        segment = hitResult.segment;
+      }
+      else if (hitResult.type == 'stoke') { //this should be the hit result.segment deal
+        var location = hitResult.location;
+        segment = path.insert(location.index+1, eventpoint); //before wa event.point
+        path.smooth();
+      }
+      
+      movePath = hitResult.type == 'fill';
+      if (movePath) {
+        paper.project.activeLayer.addChild(hitResult.item);
+      }
+    } 
+    paper.view.draw();
+    
+    //need to return [segment, path, movepath]
+        
         break;
       case -2:
         //here we do things for mouseDrag
@@ -290,23 +346,21 @@
 	segments: true,
 	stroke: true,
 	fill: true,
-	tolerance: 5
+	tolerance: 10
   };
   
   
   //rolling mouseDown into one function, for websocket
   //needs to return segment, path, and movepath
-  function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath) {
+  function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath, allLEGOS) {
     segment = path = null;
     
-    //console.log(paper.project.isEmpty());
     
-    
-    
-    var hitResult = paper.project.hitTestAll(eventpoint, hitOptions);
+    var hitResult = paper.project.hitTest(eventpoint, hitOptions);
     //before was event.point
     
     if (!hitResult) {
+      console.log("nothing hit");
       return [null, null, false];
     }
     if (modifiers) { //before was event.modifiers
@@ -317,7 +371,7 @@
     
     if (hitResult) {
       console.log("HIT RESULT DATA");
-      console.log(hitResult);
+      console.log(hitResult.item);
 		path = hitResult.item;
       console.log("AFTER PATH GETS ASSIGNED TO");
       console.log(path)
@@ -356,17 +410,10 @@
   
   
   tool.onMouseDown = function(event) {
-    
-    //make [-1, event, segment, path, movePath] into JSON to pass to socketsend
-    
     var s = event;
-    
-    //the current problem with socket send is hitTest is not recognizing a box. Need to check old code to see if 
-    //test recognizes point, then read docs to see whats going on
-    
+
     socket.send(JSON.stringify(makeMouseDownSocketArray(s)));
-    
-    
+
     //Below is the original, which works only in your current browser!
     
     /*
@@ -422,8 +469,6 @@
   
   
   function socketMOUSEDRAG(eDelta, ePoint, segment, path) {
-    
-    
     if (segment) {
       segment.point += eDelta;
       path.smooth();
@@ -432,8 +477,6 @@
       path.position = ePoint;
     }
     paper.view.draw();
-    
-    
   }
   
   function makeMouseDragSocketArray(event) {
@@ -444,8 +487,6 @@
     flag.push(event.delta);
     flag.push(segment);
     flag.push(path);
-    
-    
     return flag;
     
   }
