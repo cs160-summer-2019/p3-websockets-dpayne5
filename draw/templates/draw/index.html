@@ -124,6 +124,10 @@
 </body>
 <script>
   
+  //*** server is running HERE: http://p3-websockets-dpayne5-dpayne589733.codeanyapp.com:3000/draw/ *********
+
+  //heck yea
+  //nice
   var allLEGOS = [];
   var canvas = document.getElementById('myCanvas');
   var socket = new WebSocket('wss://p3-websockets-dpayne5-dpayne589733.codeanyapp.com/ws/draw');
@@ -136,75 +140,42 @@
   // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
   
+  //going to consolidate some of this stuff, rolling all the flag.push crap into a single function
   
-  function createLargePiece() {
-    //first piece of data sent to socket message, ie case data[0] = 1, do etc....
-    var flag = [1];
-    //need to get the data of the pieces here, the event point coordinates and flag the socket to create
-    //the piece at the coordinates
+  function makeFlagArray(index) {
+    var flag = [index];
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
     flag.push(allLEGOS);
     
-    console.log(JSON.stringify(flag));
     
-    //var s = flag.toString();
-    socket.send(JSON.stringify(flag));
+    return flag;
     
+  }
+  
+  function createLargePiece() {
+    socket.send(JSON.stringify(makeFlagArray(1))); 
   }
   
   
   function createSmallPiece() {
-    //socket send here
-    var flag = [2]
-    flag.push(event.clientX);
-    flag.push(event.clientY - 100);
-    //need to push their color as well
-    flag.push(allLEGOS);
-    socket.send(JSON.stringify(flag));
-    
-    
-    
+    socket.send(JSON.stringify(makeFlagArray(2))); 
   }
   
   function createMidPiece() {
-    var flag = [3];
-    flag.push(event.clientX);
-    flag.push(event.clientY - 100);
-    flag.push(allLEGOS);
-    socket.send(JSON.stringify(flag));
-    //
+    socket.send(JSON.stringify(makeFlagArray(3))); 
   }
   
   function createLargeSquare() {
-    var flag = [4];
-    flag.push(event.clientX);
-    flag.push(event.clientY - 100);
-    flag.push(allLEGOS);
-    socket.send(JSON.stringify(flag));
-    //
+    socket.send(JSON.stringify(makeFlagArray(4))); 
   }
   
   function createSmallSquare() {
-    var flag = [5];
-    flag.push(event.clientX);
-    flag.push(event.clientY - 100);
-    flag.push(allLEGOS);
-    socket.send(JSON.stringify(flag));
-    
-    
+    socket.send(JSON.stringify(makeFlagArray(5))); 
   }
   
   function undo() {
-    var flag = [6];
-    var s = flag.toString();
-    //just sent to make the switdch statements less bulky
-    flag.push(event.clientX);
-    flag.push(event.clientY - 100);
-    flag.push(allLEGOS);
-    socket.send(JSON.stringify(flag));
-    
-    //delete last block made
+    socket.send(JSON.stringify(makeFlagArray(6))); 
   }
   
   
@@ -223,6 +194,7 @@
   socket.onmessage = function(data) {
     
     var s = JSON.parse(data.data);
+    console.log("parsing the info from new function");
     console.log(s);
     
     var x = parseInt(s[1]);
