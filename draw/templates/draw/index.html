@@ -157,7 +157,8 @@
     var flag = [-1];
     flag.push(event.point.x);
     flag.push(event.point.y);
-    flag.push(event);
+    flag.push(event.point);
+    flag.push(event.modifiers);
     flag.push(segment);
     flag.push(path);
     flag.push(movePath);
@@ -258,7 +259,7 @@
         
       case -1:
         //here we do things for mouseDown
-        [s[4],s[5],s[6]] = socketMOUSEDOWN([s[3],s[4],s[5],s[6]]);
+        [s[5],s[6],s[7]] = socketMOUSEDOWN([s[3],s[4],s[5],s[6],s[7]]);
 
         break;
       case -2:
@@ -289,16 +290,16 @@
   
   //rolling mouseDown into one function, for websocket
   //needs to return segment, path, and movepath
-  function socketMOUSEDOWN(event,segment, path, movePath) {
+  function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath) {
     segment = path = null;
     
-    var hitResult = paper.project.hitTest(event.point, hitOptions);
+    var hitResult = paper.project.hitTest(eventpoint, hitOptions); //before was event.point
     
     if (!hitResult) {
       return [null, null, false];
     }
     
-    if (event.modifiers.shift) {
+    if (modifiers.shift) { //before was event.modifiers
       if (hitResult.type == 'segment') {
         hitResult.segment.remove();
       }
@@ -310,7 +311,7 @@
 			segment = hitResult.segment;
 		} else if (hitResult.type == 'stroke') {
 			var location = hitResult.location;
-			segment = path.insert(location.index + 1, event.point);
+			segment = path.insert(location.index + 1, eventpoint);  //before was event.point
 			path.smooth();
 		}
 	}
@@ -322,7 +323,7 @@
       }
       else if (hitResult.type == 'stoke') { //this should be the hit result.segment deal
         var location = hitResult.location;
-        segment = path.insert(location.index+1, event.point);
+        segment = path.insert(location.index+1, eventpoint); //before wa event.point
         path.smooth();
       }
       
@@ -345,9 +346,13 @@
     var s = event;
     //console.log("looking at returned pieces now for makeMOuse");
     
-    console.log(makeMouseDownSocketArray(s));
+    //console.log(makeMouseDownSocketArray(s));
     
-    //socket.send(JSON.stringify(makeMouseDownSocketArray(event)));
+    //here the circular error is happening because of the event parameter. Need to find some workaround
+    //can serialize the object, or just pull the relevant information
+    //then need to look at what I need different
+    
+    socket.send(JSON.stringify(makeMouseDownSocketArray(s)));
     
     
     //Below is the original, which works only in your current browser!
