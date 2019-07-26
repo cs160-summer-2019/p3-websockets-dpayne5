@@ -26,7 +26,7 @@
         border: 2px solid black;
         height: 700px;
         width: 95%;
-        margin-left: 30px;
+        margin: 0 auto;
       }
       
       /* This will be the bar to choose legos to drop onto the screen. */
@@ -45,11 +45,72 @@
         height: 125px;
         width: 125px;
         margin-top:35px;
-        text-align: center;
+        display: flex;
         color: gold;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 2px solid purple;
         
-        background-color: purple;
+        
       }
+      
+      .buttonContainer {
+        border: 2px solid red;
+        margin: 0 auto;
+        
+        width: 95%;
+        display: flex;
+        flex-direction: row;
+        justify-content:space-around;
+        margin-top: 20px;
+      }
+      
+      .imageContainer {
+        border: 2px solid green;
+        margin-left: 80px;
+        width: 80%;
+        display: flex;
+        margin-top: 10px;
+        justify-content: space-between;
+      }
+      
+      .imageForClick {
+        background-color: black;
+        color: white;
+      }
+      
+      .largeImage {
+        width:175px;
+        height: 30px;
+      }
+      
+      .mediumImage {
+        width: 125px;
+        height: 30px;
+      }
+      
+      .smallImage {
+        width: 75px;
+        height:30px;
+        
+      }
+      
+      .largeSimage {
+        height: 100px;
+        width: 100px;
+        
+      }
+      
+      .smallSimage {
+        height:50px;
+        width: 50px;
+        
+      }
+      
+      
+      
+      
+      
     </style>
 
 </head>
@@ -57,19 +118,72 @@
     <!-- You may change the dimensions of this canvas -->
     <canvas id="myCanvas"></canvas>
   
-  <!-- The "toolbar" which holds the different types of legos, div classes currently have placeholders,
+  <!--The "toolbar" which holds the different types of legos, div classes currently have placeholders,
         they will have buttons eventually which create new paper objects maybe in the bottom corner, and an undo button-->
-  <div class="legoBAR">
-    <div class="legoItem">LargePiece</div>
-    <div class="legoItem">MidPiece</div>
-    <div class="legoItem">SmallPiece</div>
-    <div class="legoItem">LargeSquare</div>
-    <div class="legoItem">SmallSquare</div>
-    <div class="legoItem">Undo</div>
+  
+  <div class="buttonContainer">
+    <button onclick="createLargePiece()" class="largepiece">
+         Large LEGO
+      </button>
+    <button onclick="createMidPiece()" class="largepiece">
+         Medium LEGO
+      </button>
+    <button onclick="createSmallPiece()" class="largepiece">
+         Small LEGO
+      </button>
+    <button onclick="createLargeSquare()" class="largepiece">
+         Large Square
+      </button>
+    <button onclick="createSmallSquare()" class="largepiece">
+         Small Square
+      </button>
+    <button onclick="undo()">
+         Undo
+      </button>
     
   </div>
+  <div class="imageContainer">
+    
+    
+    <div class="largeImage imageForClick"></div>
+    <div class="mediumImage imageForClick"></div>
+    <div class="smallImage imageForClick"></div>
+    <div class="largeSimage imageForClick"></div>
+    <div class="smallSimage imageForClick"></div>
+    
+    
+    
+  </div>
+  
 </body>
 <script>
+  
+  
+  function createLargePiece() {
+    console.log("bobby");
+  }
+  
+  
+  function createSmallPiece() {
+    //socket send here
+  }
+  
+  function createMidPiece() {
+    //
+  }
+  
+  function createLargeSquare() {
+    //
+  }
+  
+  function createSmallSquare() {
+    
+  }
+  
+  function undo() {
+    //delete last block made
+  }
+  
   var canvas = document.getElementById('myCanvas');
   paper.setup(canvas);
   var tool = new paper.Tool();
