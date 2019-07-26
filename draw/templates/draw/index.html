@@ -160,13 +160,8 @@
     test += event.modifiers.shift.toString;
     test += event.item.toString();
     
-    console.log(test);
     
-    var b = JSON.stringify(test);
-    console.log(b);
-    var c = JSON.parse(test);
     
-    console.log(c);
     
     
     
@@ -214,8 +209,6 @@
   socket.onmessage = function(data) {
     
     var s = JSON.parse(data.data);
-    console.log("parsing the info from new function");
-    console.log(s);
     
     
     var x = parseInt(s[1]);
@@ -234,21 +227,21 @@
     switch (parseInt(s[0])) {
       case 1:
         var newLP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(400,50));
-        newLP.fillColor = 'black';
-        allLEGOS.push(newLP);
+        newLP.fillColor = getRandomColor();
+        s[3].push(newLP);
         
         break;
       case 2:
         //do stuff
         var newMP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,50));
-        newMP.fillColor = 'black';
+        newMP.fillColor = getRandomColor();
         s[3].push(newMP);
         return newMP;
         break;
       case 3:
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
-        newSP.fillColor = 'black';
+        newSP.fillColor = getRandomColor();
         s[3].push(newMP);
         return newSP;
         break;
@@ -256,20 +249,19 @@
         //do stuff
         var newLS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,200));
         s[3].push(newLS);
-        newLS.fillColor = 'black';
+        newLS.fillColor = getRandomColor();
         return newLS;
         break;
       case 5:
         //do stuff
         var newSS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,100));
         s[3].push(newSS);
-        newSS.fillColor = 'black';
+        newSS.fillColor = getRandomColor();
         return newSS;
         break;
       case 6:
         // *** currently the undo button does NOT work
         //do stuff
-        //console.log("undo works");
         //allLEGOS[allLEGOS.length -1].fillColor = 'white';
         s[3][s[3].length -1].fillColor = 'white';
         var toDelete = s[3].pop();
@@ -285,25 +277,20 @@
         break;
       case -2:
         //here we do things for mouseDrag
-        console.log("in the socketMOUSEDRAG");
-        console.log(s);
         
         
         //ok, these two lines are good. A new point is made, nothing special, now need the path
         var b = new paper.Point(s[2][1], s[2][2]);
         
-        console.log(b);
         
         
         var ID = s[1]
-        //console.log("THE ID IN THE SOCKET SHOULD BE 1::::, ", id);
         
         var newpath = paper.project.getItems({
         id: ID
         
       });
         
-        console.log(newpath);
         
         path.position = b;
         
@@ -314,7 +301,6 @@
         break;
         
       default:
-        console.log("nothing happened");
         
         
     }
@@ -339,17 +325,14 @@
   //needs to return segment, path, and movepath
   function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath, allLEGOS, eventItem) {
     segment = path = null;
-    console.log(eventItem[1]);
     
     
-    console.log(paper.project.isEmpty());
     
     //var hitResult = paper.project.hitTest(eventpoint, hitOptions);
     //before was event.point
     var hitResult = eventItem[1];
     
     if (!hitResult) {
-      console.log("nothing hit");
       return [null, null, false];
     }
     if (modifiers) { //before was event.modifiers
@@ -359,8 +342,6 @@
     }
     
     if (hitResult) {
-      console.log("HIT RESULT DATA");
-      console.log(hitResult.item);
 		path = hitResult.item;
       console.log("AFTER PATH GETS ASSIGNED TO");
       console.log(path)
@@ -398,6 +379,11 @@
   
   
   
+  
+  
+  //going to add some print statements here to see if anythigns happening
+  //how much of this activates, and how often 
+  
   tool.onMouseDown = function(event) {
     var s = event;
     console.log("on mousedown checking event.item");
@@ -421,7 +407,9 @@
     
     
     if (event.modifiers.shift) {
+      
       if (hitResult.type == 'segment') {
+        console.log("************EVENTMOD SHIFT AND SEGMENT ********")
         hitResult.segment.remove();
       }
     }
@@ -429,8 +417,10 @@
     if (hitResult) {
 		path = hitResult.item;
 		if (hitResult.type == 'segment') {
+      console.log("************EVENTMOD SEGMENT********")
 			segment = hitResult.segment;
 		} else if (hitResult.type == 'stroke') {
+      console.log("************EVENTMOD STROKE********")
 			var location = hitResult.location;
 			segment = path.insert(location.index + 1, event.point);
 			path.smooth();
@@ -440,9 +430,10 @@
     if (hitResult) {
       path = hitResult.item;
       if (hitResult.type == 'segment') {
+        console.log("************EVENTMOD SEGMENT********")
         segment = hitResult.segment;
       }
-      else if (hitResult.type == 'stoke') { //this should be the hit result.segment deal
+      else if (hitResult.type == 'stroke') { //this should be the hit result.segment deal
         var location = hitResult.location;
         segment = path.insert(location.index+1, event.point);
         path.smooth();
@@ -450,6 +441,7 @@
       
       movePath = hitResult.type == 'fill';
       if (movePath) {
+        console.log("************MOVECHILD LAYER********")
         paper.project.activeLayer.addChild(hitResult.item);
       }
     } 
@@ -481,7 +473,6 @@
     var hitResult = paper.project.hitTest(event.point, hitOptions);
     //looking at results of hitResult;
     //here this is initialize {'fill } etc etc....so this is the problem
-    console.log(hitResult);
     
     if (!hitResult) {
       return;
@@ -525,9 +516,8 @@
   }
   
   
-  
+  /* dont need, trash */
   function socketMOUSEDRAG(eDelta, ePoint, segment, path) {
-    console.log(eDelta, ePoint,"segment:::", segment, "path::::",path);
     if (segment) {
       segment.point += eDelta;
       path.smooth();
@@ -538,6 +528,9 @@
     paper.view.draw();
   }
   
+  
+  //dont need, trash
+  /*
   function makeMouseDragSocketArray(event) {
     var flag = [-2];
     flag.push(event.point.x);
@@ -549,6 +542,7 @@
     return flag;
     
   }
+  */
   
   
   function makeMouseDragTwo(eventPoint, id) {
@@ -561,11 +555,7 @@
   //
   tool.onMouseDrag = function(event) {
     
-   // var s = JSON.stringify(makeMouseDragSocketArray(event));
-    //socket.send(s);
-    
-    
-    //below this line is old, working code for one browser window only
+   
     
     
     if (segment) {
@@ -574,33 +564,9 @@
     }
     else if (path) {
       
-      console.log("*********"); //might be the key!
-      console.log(path.id);
-      
-      var z = paper.project.getItems({
-        id: 1
-        
-      });
-      
-      
-      console.log("THIS COULD BE IT BOUYS");
-      console.log(z);
-      
-      //here we flag, and go to move the point in whatever.here
-      var d = JSON.stringify(path);
-      //console.log(d);
-      
-      var f = JSON.stringify(event.point);
-      var e = path.exportJSON();
-      //console.log("printing exportJSON of path");
-      //console.log(e);
-      
       makeMouseDragTwo(event.point, path.id);
+      //path.position = event.point
       
-      //makeMouseDragTwo(event.point, path);
-      //path.position = event.point;
-      
-      //what if we just send it here? will try after food
     }
     
     
@@ -618,7 +584,6 @@
 
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
-  console.log(url);
 
   
     var socket = new WebSocket('wss://p3-websockets-dpayne5-dpayne589733.codeanyapp.com/ws/draw');
@@ -644,12 +609,10 @@
   
   
   if (url == "https://p3-websockets-dpayne5-dpayne589733.codeanyapp.com/draw/?size-small") {
-    console.log("small url")
     isSmall = true;
     
     for (i=0; i< peopleArray.length; i++) {
       if (i != randomIndex) {
-        console.log("setting path visibility to false");
         peopleArray[i].visible = false;
       }
     }
@@ -664,20 +627,16 @@
     //here have to make another socket send to flag if the thing is small
     
     var oneCdata = "[" + -2 + "," + randomIndex + "]";
-    console.log(oneCdata);
     
     socket.send(oneCdata)
     
   }
   
   tool.onMouseDrag = function(event) {
-   // console.log("dragging");
     
       var d = JSON.stringify(event.point);
-    //console.log(d);
       d = d.substring(0, d.length -1);
       d = d + ',"' + colors[randomIndex] + '",' + randomIndex +']';
-    console.log(d);
     
       socket.send(d);
     
@@ -691,7 +650,6 @@
     peopleArray[randomIndex] = new paper.Path();
     
     var passFlag = "["+ randomIndex + ',' + -1 + "]";
-    console.log(passFlag);
     socket.send(passFlag);
     
     //on mouse Up send a thing to the other arrays, and make sure the new piece is cleared.
@@ -701,8 +659,6 @@
     socket.onmessage = function(data) {
       var c = JSON.parse(data.data);
       
-      console.log(count);
-      console.log(data.data);
       
       
       if (c[0] == -2) {
@@ -717,7 +673,6 @@
         return;
       }
       
-      //console.log(publicPath.segments);
       
       if (count == 0) {
         peopleArray[c[4]] = new paper.Path();
@@ -730,13 +685,10 @@
       }
       else if (count > 1) {
         //var c = JSON.parse(data.data);
-      console.log(c);
-        console.log(c[4], c[3]);
       peopleArray[c[4]].strokeColor = c[3];
       peopleArray[c[4]].add(new paper.Point(c[1],c[2]));
         
         
-        console.log(count);
         
       }
       
