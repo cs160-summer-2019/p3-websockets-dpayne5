@@ -19,13 +19,12 @@
         display: flex;
         justify-content: center;
         flex-direction: column;
-        
-        
-      }
+    }
       #myCanvas {
         height: 700px;
         width: 95%;
         margin: 0 auto;
+        background: radial-gradient(circle, rgba(247,238,238,1) 8%, rgba(255,255,255,1) 41%, rgba(240,211,239,1) 90%, rgba(238,174,202,1) 100%);
       }
       
       /* This will be the bar to choose legos to drop onto the screen. */
@@ -144,27 +143,23 @@
   
   function makeFlagArray(index) {
     var flag = [index];
+    console.log("what is this flag thingy: " + flag);
+    console.log(typeof flag);
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
     flag.push(allLEGOS);
+    console.log("flag after adding lego piece: " + flag)
     return flag;
-    
   }
+ 
   
-  //this is to combine two shapes together
-  //  result = square[operation](ring);
   function makeMouseDownSocketArray(event) {
     
     var test = "-1";
     test += event.point.toString();
     test += event.modifiers.shift.toString;
     test += event.item.toString();
-    
-    
-    
-    
-    
-    
+
     var flag = [-1];
     flag.push(event.point.x);
     flag.push(event.point.y);
@@ -184,9 +179,10 @@
     socket.send(JSON.stringify(makeFlagArray(1))); 
   }
   
-  
   function createSmallPiece() {
-    socket.send(JSON.stringify(makeFlagArray(2))); 
+    console.log("printing out all lego arrays:" + allLEGOS);
+    socket.send(JSON.stringify(makeFlagArray(2)));
+    console.log("after adding:" + allLEGOS);
   }
   
   function createMidPiece() {
@@ -204,18 +200,9 @@
   function undo() {
     socket.send(JSON.stringify(makeFlagArray(6))); 
   }
- 
-  //socket function, intended to be VERY large. Has switch cases for just about everything
-  socket.onmessage = function(data) {
-    
-    var s = JSON.parse(data.data);
-    
-    
-    var x = parseInt(s[1]);
-    var y = parseInt(s[2]);
-    
-    //generate random colors function
-    function getRandomColor() {
+      
+  //generate random colors function
+  function getRandomColor() {
       var options = '0123456789ABCDEF';
       var color = '#';
       for (var i = 0; i < 6; i++) {
@@ -223,6 +210,14 @@
       }
       return color;
     }
+  //socket function, intended to be VERY large. Has switch cases for just about everything
+  socket.onmessage = function(data) {
+    
+    var s = JSON.parse(data.data);
+    console.log(s);
+    
+    var x = parseInt(s[1]);
+    var y = parseInt(s[2]);
     
     switch (parseInt(s[0])) {
       case 1:
@@ -281,8 +276,6 @@
         
         //ok, these two lines are good. A new point is made, nothing special, now need the path
         var b = new paper.Point(s[2][1], s[2][2]);
-        
-        
         
         var ID = s[1]
         
@@ -554,10 +547,6 @@
   
   //
   tool.onMouseDrag = function(event) {
-    
-   
-    
-    
     if (segment) {
       segment.point += event.delta;
       path.smooth();
@@ -565,6 +554,7 @@
     else if (path) {
       
       makeMouseDragTwo(event.point, path.id);
+      console.log("what is da path: " + path + " " + path.id);
       //path.position = event.point
       
     }
