@@ -135,6 +135,138 @@
   
   var segment, path;
   var movePath = false;
+  var hitOptions = {
+	segments: true,
+	stroke: true,
+	fill: true,
+	tolerance: 10
+  };
+  
+    tool.onMouseDown = function(event) {
+      
+      segment = path = null;
+      var hitResult = paper.project.hitTest(event.point, hitOptions);
+      
+      if (!hitResult) {
+          return;
+          }
+      
+      //taken care of
+      if (hitResult) {
+        path = hitResult.item;
+        //socket send hitResult.item;
+        //updateClientPath(hitResult.item); currently doesnt work, gives back a different ID from the item imported, also not the same
+      }
+      
+      movePath = hitResult.type == 'fill';
+      if (movePath) {
+        paper.project.activeLayer.addChild(hitResult.item);
+        
+        //socket send to make this happen across clients as well
+      }
+      /*
+      var s = event;
+    segment = path = null;
+    
+    
+    var hitResult = paper.project.hitTest(event.point, hitOptions);
+    
+    //here
+    
+    
+    //lets try and send this hit result through.....
+    console.log(hitResult);
+    //looking at results of hitResult;
+    //here this is initialize {'fill } etc etc....so this is the problem
+    console.log(hitResult);
+    
+    if (!hitResult) {
+      return;
+    }
+    
+    
+    if (event.modifiers.shift) {
+      
+      if (hitResult.type == 'segment') {
+        hitResult.segment.remove();
+      }
+    }
+    
+    if (hitResult) {
+		path = hitResult.item;
+		if (hitResult.type == 'segment') {
+      console.log("************EVENTMOD SEGMENT********")
+			segment = hitResult.segment;
+		} else if (hitResult.type == 'stroke') {
+      console.log("************EVENTMOD STROKE********")
+			var location = hitResult.location;
+			segment = path.insert(location.index + 1, event.point);
+			path.smooth();
+		}
+	}
+    
+    if (hitResult) {
+      path = hitResult.item;
+      //need to send to the socket that path = this item *** IMPORTANT ***
+      console.log("HIT RESULT ITEM IS:::", hitResult.item);
+      //console.log(hitResult.item.id);
+      console.log("HIT RESULT ITEM ID IS :::", hitResult.item.id);
+      
+      
+      
+      
+      if (hitResult.type == 'segment') {
+        console.log("************EVENTMOD SEGMENT********")
+        segment = hitResult.segment;
+      }
+      else if (hitResult.type == 'stroke') { //this should be the hit result.segment deal
+        var location = hitResult.location;
+        segment = path.insert(location.index+1, event.point);
+        path.smooth();
+      }
+      
+      movePath = hitResult.type == 'fill';
+      if (movePath) {
+        console.log("************MOVECHILD LAYER********")
+        paper.project.activeLayer.addChild(hitResult.item);
+      }
+    } 
+    */
+
+    
+  }
+    function updateClientPath(hitResultPath) {
+      var toPass = JSON.stringify(hitResultPath); //what we want to pass to the websocket
+      console.log("THE PATH BEFORE ITS SENT ::: ", path);
+      socket.send(toPass);
+    }
+  
+  function updateClientMovePath(hitReasultPath) {
+    
+  }
+    
+    
+    
+    
+    tool.onMouseDrag = function(event) {
+    if (segment) {
+      segment.point += event.delta;
+      path.smooth();
+    }
+    else if (path) {
+      
+      makeMouseDragTwo(event.point, path.id);
+      //console.log("what is da path: " + path + " " + path.id);
+      //path.position = event.point
+      
+    }
+    
+    
+  }
+  
+  
+  
+  
   
   // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
@@ -152,6 +284,13 @@
     return flag;
   }
  
+  
+  
+  
+  
+  
+  
+  
   
   function makeMouseDownSocketArray(event) {
     
@@ -178,25 +317,20 @@
   function createLargePiece() {
     socket.send(JSON.stringify(makeFlagArray(1))); 
   }
-  
   function createSmallPiece() {
     //console.log("printing out all lego arrays:" + allLEGOS);
     socket.send(JSON.stringify(makeFlagArray(2)));
     //console.log("after adding:" + allLEGOS);
   }
-  
   function createMidPiece() {
     socket.send(JSON.stringify(makeFlagArray(3))); 
   }
-  
   function createLargeSquare() {
     socket.send(JSON.stringify(makeFlagArray(4))); 
   }
-  
   function createSmallSquare() {
     socket.send(JSON.stringify(makeFlagArray(5))); 
   }
-  
   function undo() {
     socket.send(JSON.stringify(makeFlagArray(6))); 
   }
@@ -210,8 +344,6 @@
       }
       return color;
     }
-  
-  //IDEA::: add to block creation a random ID that is the same across the board for each piece
   function getRandomID() {
     var randID = Math.floor((Math.random() * 10000000) % 1000);
     return randID;
@@ -223,6 +355,14 @@
   socket.onmessage = function(data) {
     
     var s = JSON.parse(data.data);
+    
+    if (s[0] == 'Path') {
+      console.log("HERE WE ARE SENDING THE PATH JSON!!! EXCITING!!!");
+      path = paper.importJSON(data.data);
+      console.log("THE PATH INSIDE OF SOCKET ONMESSAGE ON UPDATE ::::", path);
+      paper.project.activeLayer.addChild(paper.importJSON(data.data));
+      
+    }
     
     var x = parseInt(s[1]);
     var y = parseInt(s[2]);
@@ -295,7 +435,6 @@
         
         
         //*** testing path IDs
-        console.log("PATH ID IS,    : ", path.id);
         
         
         path.position = b;
@@ -318,17 +457,6 @@
   //variables for movement abilities
   
   
-  
-  var hitOptions = {
-	segments: true,
-	stroke: true,
-	fill: true,
-	tolerance: 10
-  };
-  
-  
-  //rolling mouseDown into one function, for websocket
-  //needs to return segment, path, and movepath
   function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath, allLEGOS, eventItem) {
     segment = path = null;
     
@@ -379,86 +507,6 @@
     console.log("BEFORE RETURN<> SEGMENT PATH movePAth: ", segment, path, movePath);
     return [segment, path, movePath];
   }
-  //going to add some print statements here to see if anythigns happening
-  //how much of this activates, and how often 
-  
-  tool.onMouseDown = function(event) {
-    var s = event;
-    console.log("on mousedown checking event.item");
-    console.log(event.item);
-        
-    segment = path = null;
-    
-    
-    var hitResult = paper.project.hitTest(event.point, hitOptions);
-    
-    //here
-    
-    
-    //lets try and send this hit result through.....
-    console.log(hitResult);
-    //looking at results of hitResult;
-    //here this is initialize {'fill } etc etc....so this is the problem
-    console.log(hitResult);
-    
-    if (!hitResult) {
-      return;
-    }
-    
-    
-    if (event.modifiers.shift) {
-      
-      if (hitResult.type == 'segment') {
-        hitResult.segment.remove();
-      }
-    }
-    
-    if (hitResult) {
-		path = hitResult.item;
-		if (hitResult.type == 'segment') {
-      console.log("************EVENTMOD SEGMENT********")
-			segment = hitResult.segment;
-		} else if (hitResult.type == 'stroke') {
-      console.log("************EVENTMOD STROKE********")
-			var location = hitResult.location;
-			segment = path.insert(location.index + 1, event.point);
-			path.smooth();
-		}
-	}
-    
-    if (hitResult) {
-      path = hitResult.item;
-      //need to send to the socket that path = this item *** IMPORTANT ***
-      console.log("HIT RESULT ITEM IS:::", hitResult.item);
-      //console.log(hitResult.item.id);
-      console.log("HIT RESULT ITEM ID IS :::", hitResult.item.id);
-      
-      
-      
-      
-      if (hitResult.type == 'segment') {
-        console.log("************EVENTMOD SEGMENT********")
-        segment = hitResult.segment;
-      }
-      else if (hitResult.type == 'stroke') { //this should be the hit result.segment deal
-        var location = hitResult.location;
-        segment = path.insert(location.index+1, event.point);
-        path.smooth();
-      }
-      
-      movePath = hitResult.type == 'fill';
-      if (movePath) {
-        console.log("************MOVECHILD LAYER********")
-        paper.project.activeLayer.addChild(hitResult.item);
-      }
-    } 
-
-    
-  }
-  
-  
-  
-  
   function makeMouseDragTwo(eventPoint, id) {
     var flag = [-2];
     flag.push(id);
@@ -467,21 +515,11 @@
   }
   
   //
-  tool.onMouseDrag = function(event) {
-    if (segment) {
-      segment.point += event.delta;
-      path.smooth();
-    }
-    else if (path) {
-      
-      makeMouseDragTwo(event.point, path.id);
-      console.log("what is da path: " + path + " " + path.id);
-      //path.position = event.point
-      
-    }
-    
-    
-  }
+  
+  
+  
+  
+  
   
 
 </script>
