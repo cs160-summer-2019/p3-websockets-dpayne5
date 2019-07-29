@@ -23,7 +23,7 @@
         height: 700px;
         width: 95%;
         margin: 0 auto;
-        background: radial-gradient(circle, rgba(247,238,238,1) 8%, rgba(255,255,255,1) 41%, rgba(240,211,239,1) 90%, rgba(238,174,202,1) 100%);
+        background: linear-gradient(180deg, rgba(149, 147, 226, 0.83) 0%, rgba(212, 252, 221, 0.971139) 83.01%, #CDFCD7 99.99%, rgba(255, 255, 255, 0.78) 100%), #399E7A;
       }
       
       /* This will be the bar to choose legos to drop onto the screen. */
@@ -135,6 +135,7 @@
   
   var segment, path;
   var movePath = false;
+  
   var hitOptions = {
 	segments: true,
 	stroke: true,
@@ -143,6 +144,9 @@
   };
   
     tool.onMouseDown = function(event) {
+      
+      /*
+      //NEW THINGS HERE *********
       
       segment = path = null;
       var hitResult = paper.project.hitTest(event.point, hitOptions);
@@ -164,7 +168,12 @@
         
         //socket send to make this happen across clients as well
       }
-      /*
+      
+      // ******** END OF NEW THINGS
+      
+      */ 
+      //OLD WORKING-ISH CODE BELOW ********
+  
       var s = event;
     segment = path = null;
     
@@ -173,12 +182,8 @@
     
     //here
     
-    
-    //lets try and send this hit result through.....
-    console.log(hitResult);
-    //looking at results of hitResult;
-    //here this is initialize {'fill } etc etc....so this is the problem
-    console.log(hitResult);
+    console.log("HitResult :: ", hitResult);
+   
     
     if (!hitResult) {
       return;
@@ -231,7 +236,9 @@
         paper.project.activeLayer.addChild(hitResult.item);
       }
     } 
-    */
+    
+      
+      //END OF OLD WORKING CODE *********
 
     
   }
@@ -263,7 +270,7 @@
     else if (path) {
       
       
-      makeMouseDragTwo(event.point, path.id);
+      makeMouseDragTwo(event.point, path.id, path);
       //console.log("what is da path: " + path + " " + path.id);
       //path.position = event.point
       
@@ -272,19 +279,16 @@
     
   }
     
-    function makeMouseDragTwo(eventPoint, id) {
+    function makeMouseDragTwo(eventPoint, id, path) {
       var flag = [-2];
       flag.push(id);
       flag.push(eventPoint);
+      flag.push(path);
       socket.send(JSON.stringify(flag));
       console.log("STRINGIFYD FOR FLAG OF MOUSEDRAG");
       console.log(JSON.stringify(flag));
   }
-  
-  
-  
-  
-  
+
   // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
   
@@ -296,19 +300,13 @@
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
     flag.push(allLEGOS);
-    flag.push(getRandomID);
+    flag.push(getRandomID());
     console.log("flag after adding lego piece: " + flag)
     return flag;
+    
+    //ingraine color in the array here for consistent color wo breaking the code -__-  
   }
  
-  
-  
-  
-  
-  
-  
-  
-  
   function makeMouseDownSocketArray(event) {
     
     var test = "-1";
@@ -361,6 +359,8 @@
       }
       return color;
     }
+  
+  //random ID generator
   function getRandomID() {
     var randID = Math.floor((Math.random() * 10000000) % 1000);
     return randID;
@@ -371,12 +371,14 @@
   //socket function, intended to be VERY large. Has switch cases for just about everything
   socket.onmessage = function(data) {
     
+    console.log("incoming data e.g: function(data) ::: ", data);
+    
     var s = JSON.parse(data.data);
     
+    console.log("data after JSON.parse(data.data) :::: ",s );
+    
     if (s[0] == 'Path') {
-      console.log("HERE WE ARE SENDING THE PATH JSON!!! EXCITING!!!");
       //path = paper.importJSON(data.data);
-      console.log("THE PATH INSIDE OF SOCKET ONMESSAGE ON UPDATE ::::", path);
       paper.project.activeLayer.addChild(paper.importJSON(data.data));
       
     }
@@ -442,10 +444,26 @@
         
         //mouseDrag socketSend
       case -2:
-        console.log("all paths array::: ", allLEGOS);
         
-        console.log("THE PATH IN CASE -2 IS :::: ", path);
-        console.log("PATH ID IS :: ", path.id);
+        console.log("path information :::: ",path);
+        
+        console.log(path.id) // the problem here is that path is UNDEFINED in the second window on the start.console
+        //and when the item is created the path should be 
+        
+        //this line tells us that the s[3] data is a dictionary of sorts, ie ["path", {path data}]
+        console.log("the path sent through comes in as this :::: ", s[3]);
+        
+        
+        //if we create a new path object, it will be different from the original i believe, checking with s[3][1]
+        console.log("index 1 of s[3] is :::: ", s[3][1]);
+        
+        //checking it as an item becomes .....
+        var k = paper.importJSON(s[3][1]);
+        
+        //but I dont think this is an item..... At least its an item different looking from the path passed index
+        
+       
+        
 
         var b = new paper.Point(s[2][1], s[2][2]); 
         var ID = s[1]
