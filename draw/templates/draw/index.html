@@ -69,7 +69,8 @@
         margin-top: 10px;
         justify-content: space-evenly;
       }
-  
+      
+      
     </style>
 
 </head>
@@ -181,7 +182,6 @@
     
     //here
     
-    console.log("HitResult :: ", hitResult);
    
     
     if (!hitResult) {
@@ -287,25 +287,34 @@
       console.log("STRINGIFYD FOR FLAG OF MOUSEDRAG");
       console.log(JSON.stringify(flag));
   }
-
+  
+  
+  
+  
+  
   // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
   
   
   function makeFlagArray(index) {
     var flag = [index];
-    console.log("what is this flag thingy: " + flag);
     console.log(typeof flag);
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
-    flag.push(allLEGOS);
-    flag.push(getRandomColor());
+    flag.push(allLEGOS); //probably a problem
+    flag.push(getRandomID()); //potentially add attribute, wrap in another object
     console.log("flag after adding lego piece: " + flag)
     return flag;
-    
-    //ingraine color in the array here for consistent color wo breaking the code -__-  
   }
  
+  
+  
+  
+  
+  
+  
+  
+  
   function makeMouseDownSocketArray(event) {
     
     var test = "-1";
@@ -388,33 +397,33 @@
     switch (parseInt(s[0])) {
         //making a new LargeLego
       case 1:
-        console.log(s);
         var newLP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(400,50));
         newLP.fillColor = getRandomColor();
-        s[3].push(newLP);
+        allLEGOS.push(newLP);
+        console.log("total list of all blocks",allLEGOS)
         
         break;
         //making new medium lego
       case 2:
         //do stuff
         var newMP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,50));
-        newMP.fillColor = getRandomColor();
-        s[3].push(newMP);
+        newMP.fillColor = s[4];
+        allLEGOS.push(newMP);
         return newMP;
         break;
         //making new smallLego
       case 3:
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
-        newSP.fillColor = s[4];
-        s[3].push(newMP);
+        newSP.fillColor = getRandomColor();
+        allLEGOS.push(newMP);
         return newSP;
         break;
         //making new LargeSquare
       case 4:
         //do stuff
         var newLS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,200));
-        s[3].push(newLS);
+        allLEGOS.push(newLS);
         newLS.fillColor = getRandomColor();
         return newLS;
         break;
@@ -422,7 +431,7 @@
       case 5:
         //do stuff
         var newSS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,100));
-        s[3].push(newSS);
+        allLEGOS.push(newSS);
         newSS.fillColor = getRandomColor();
         return newSS;
         break;
@@ -444,17 +453,13 @@
         //mouseDrag socketSend
       case -2:
         
-        console.log("path information :::: ",path);
         
-        console.log(path.id) // the problem here is that path is UNDEFINED in the second window on the start.console
         //and when the item is created the path should be 
         
         //this line tells us that the s[3] data is a dictionary of sorts, ie ["path", {path data}]
-        console.log("the path sent through comes in as this :::: ", s[3]);
         
         
         //if we create a new path object, it will be different from the original i believe, checking with s[3][1]
-        console.log("index 1 of s[3] is :::: ", s[3][1]);
         
         //checking it as an item becomes .....
         var k = paper.importJSON(s[3][1]);
@@ -466,7 +471,6 @@
 
         var b = new paper.Point(s[2][1], s[2][2]); 
         var ID = s[1]
-        console.log("ID SENT BY JSON IS::: ", ID);
         var newpath = paper.project.getItems({
         id: ID
         
@@ -518,7 +522,6 @@
     
     if (hitResult) {
 		path = hitResult.item;
-      console.log("HIT RESULT ITEM IS ::: ", hitResult.item);
 		if (hitResult.type == 'segment') {
 			segment = hitResult.segment;
 		} else if (hitResult.type == 'stroke') {
@@ -547,7 +550,6 @@
     paper.view.draw();
     
     //need to return [segment, path, movepath]
-    console.log("BEFORE RETURN<> SEGMENT PATH movePAth: ", segment, path, movePath);
     return [segment, path, movePath];
   }
 
