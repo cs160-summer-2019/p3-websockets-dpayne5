@@ -11,7 +11,6 @@
     <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
   <script type="text/javascript" src="https://cdn.rawgit.com/alexgibson/shake.js/master/shake.js"></script>
   
-
     <style type="text/css">
       
       /* Body element, flex display, justify content center, to center all following content*/
@@ -260,12 +259,9 @@
         //allLEGOS[allLEGOS.length -1].fillColor = 'white';
         s[3][s[3].length -1].fillColor = 'white';
         var toDelete = s[3].pop();
-        var toDelete = new paper.Path;
-        
-        
+        var toDelete = new paper.Path;    
         break;
-        
-        
+
       case -1:
         socketMOUSEDOWN(s[3], s[4], s[5], s[6], s[7], s[8], s[9]);
         
@@ -369,11 +365,6 @@
     console.log("BEFORE RETURN<> SEGMENT PATH movePAth: ", segment, path, movePath);
     return [segment, path, movePath];
   }
-  
-  
-  
-  
-  
   //going to add some print statements here to see if anythigns happening
   //how much of this activates, and how often 
   
