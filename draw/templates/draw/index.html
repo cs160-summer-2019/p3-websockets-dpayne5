@@ -61,6 +61,10 @@
         margin-top: 20px;
       }
       
+      .button {
+        
+        
+      }
       .imageContainer {
         border: 2px solid green;
         margin-left: 30px;
@@ -76,7 +80,8 @@
 </head>
 <body>
     <!-- You may change the dimensions of this canvas -->
-    <canvas id="myCanvas"></canvas>
+    <canvas id="myCanvas">
+  </canvas>
   
   <!--The "toolbar" which holds the different types of legos, div classes currently have placeholders,
         they will have buttons eventually which create new paper objects maybe in the bottom corner, and an undo button-->
@@ -197,7 +202,9 @@
     }
     
     if (hitResult) {
+      console.log("HITRESULT ID ::::", hitResult.item.id);
 		path = hitResult.item;
+      updateClientPath(hitResult.item);
       //here need to update path to be the same item across all clients
       
 		if (hitResult.type == 'segment') {
@@ -214,9 +221,7 @@
     if (hitResult) {
       path = hitResult.item;
       //need to send to the socket that path = this item *** IMPORTANT ***
-      console.log("HIT RESULT ITEM IS:::", hitResult.item);
       //console.log(hitResult.item.id);
-      console.log("HIT RESULT ITEM ID IS :::", hitResult.item.id);
       
       
       
@@ -234,6 +239,8 @@
       movePath = hitResult.type == 'fill';
       if (movePath) {
         console.log("************MOVECHILD LAYER********")
+        
+        //need to add a socket onmessage event here
         paper.project.activeLayer.addChild(hitResult.item);
       }
     } 
@@ -252,12 +259,11 @@
     
     function updateClientPath(hitResultPath) {
       var toPass = JSON.stringify(hitResultPath); //what we want to pass to the websocket
-      console.log("THE PATH BEFORE ITS SENT ::: ", path);
       var flag = [-10];
       flag.push(path.id);
       //testing flag push here
-      console.log(flag);
-      socket.send(toPass);
+      socket.send(JSON.stringify(flag));
+      
     }
   
   
@@ -293,8 +299,6 @@
       flag.push(eventPoint);
       flag.push(path);
       socket.send(JSON.stringify(flag));
-      console.log("STRINGIFYD FOR FLAG OF MOUSEDRAG");
-      console.log(JSON.stringify(flag));
   }
   
   
@@ -307,12 +311,10 @@
   
   function makeFlagArray(index) {
     var flag = [index];
-    console.log(typeof flag);
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
     flag.push(allLEGOS); //probably a problem
     flag.push(getRandomColor()); //potentially add attribute, wrap in another object
-    console.log("flag after adding lego piece: " + flag)
     return flag;
   }
  
@@ -388,11 +390,17 @@
   //socket function, intended to be VERY large. Has switch cases for just about everything
   socket.onmessage = function(data) {
     
-    console.log("incoming data e.g: function(data) ::: ", data);
+    
+    console.log("current path is .... : ", path);
+    
+    
+    var k = data.data;
     
     var s = JSON.parse(data.data);
     
-    console.log("data after JSON.parse(data.data) :::: ",s );
+    console.log(s);
+    
+    //console.log("data after JSON.parse(data.data) :::: ",s );
     
     if (s[0] == 'Path') {
       //path = paper.importJSON(data.data);
@@ -418,14 +426,14 @@
         var newMP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,50));
         newMP.fillColor = s[4];
         allLEGOS.push(newMP);
-        return newMP;
+        
         break;
         //making new smallLego
       case 3:
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
         newSP.fillColor = s[4];
-        allLEGOS.push(newMP);
+        allLEGOS.push(newSP);
         return newSP;
         break;
         //making new LargeSquare
@@ -458,44 +466,31 @@
         socketMOUSEDOWN(s[3], s[4], s[5], s[6], s[7], s[8], s[9]);
         
         break;
+      case -10:
+        path = paper.project.getItems ({
+          id: s[1]
+          
+        });
         
+        path = allLEGOS.filter((rect) => {
+          return rect.id === s[1]
+        })[0];
+        break;
+        
+        console.log("PATH ON UPDATE CLIENT ",path);
         //mouseDrag socketSend
       case -2:
-        
-        
-        //and when the item is created the path should be 
-        
-        //this line tells us that the s[3] data is a dictionary of sorts, ie ["path", {path data}]
-        
-        
-        //if we create a new path object, it will be different from the original i believe, checking with s[3][1]
-        
-        //checking it as an item becomes .....
-        var k = paper.importJSON(s[3][1]);
-        
-        //but I dont think this is an item..... At least its an item different looking from the path passed index
-        
-       
-        
-
+                
         var b = new paper.Point(s[2][1], s[2][2]); 
-        var ID = s[1]
-        var newpath = paper.project.getItems({
-        id: ID
-        
-      });
-        
-        //so this is making a new point, and then taking the ID, and getting the item based off of ID, and assigning
-        //to it a new location. Now since this isnt *happening* on any screen, it must be getting the wrong ID,
         
         
+        //var ID = s[1]
         
-        //*** testing path IDs
         
         
         path.position = b;
         
-        newpath.position = b;
+        //newpath.position = b;
         
         
         
