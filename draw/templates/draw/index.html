@@ -198,6 +198,8 @@
     
     if (hitResult) {
 		path = hitResult.item;
+      //here need to update path to be the same item across all clients
+      
 		if (hitResult.type == 'segment') {
       console.log("************EVENTMOD SEGMENT********")
 			segment = hitResult.segment;
@@ -244,10 +246,17 @@
     
     
     
+    //get the ID of the hitResult
+    //send the ID to the socket onmessage
+    
     
     function updateClientPath(hitResultPath) {
       var toPass = JSON.stringify(hitResultPath); //what we want to pass to the websocket
       console.log("THE PATH BEFORE ITS SENT ::: ", path);
+      var flag = [-10];
+      flag.push(path.id);
+      //testing flag push here
+      console.log(flag);
       socket.send(toPass);
     }
   
@@ -302,7 +311,7 @@
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
     flag.push(allLEGOS); //probably a problem
-    flag.push(getRandomID()); //potentially add attribute, wrap in another object
+    flag.push(getRandomColor()); //potentially add attribute, wrap in another object
     console.log("flag after adding lego piece: " + flag)
     return flag;
   }
@@ -398,7 +407,7 @@
         //making a new LargeLego
       case 1:
         var newLP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(400,50));
-        newLP.fillColor = getRandomColor();
+        newLP.fillColor = s[4];
         allLEGOS.push(newLP);
         console.log("total list of all blocks",allLEGOS)
         
@@ -415,7 +424,7 @@
       case 3:
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
-        newSP.fillColor = getRandomColor();
+        newSP.fillColor = s[4];
         allLEGOS.push(newMP);
         return newSP;
         break;
@@ -424,7 +433,7 @@
         //do stuff
         var newLS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,200));
         allLEGOS.push(newLS);
-        newLS.fillColor = getRandomColor();
+        newLS.fillColor = s[4];
         return newLS;
         break;
         //making new SmallSquare
@@ -432,7 +441,7 @@
         //do stuff
         var newSS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,100));
         allLEGOS.push(newSS);
-        newSS.fillColor = getRandomColor();
+        newSS.fillColor = s[4];
         return newSS;
         break;
         
