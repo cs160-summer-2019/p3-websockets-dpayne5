@@ -155,7 +155,7 @@
       if (hitResult) {
         path = hitResult.item;
         //socket send hitResult.item;
-        //updateClientPath(hitResult.item); currently doesnt work, gives back a different ID from the item imported, also not the same
+        updateClientPath(hitResult.item); //currently doesnt work, gives back a different ID from the item imported, also not the same
       }
       
       movePath = hitResult.type == 'fill';
@@ -235,25 +235,33 @@
 
     
   }
+    
+    
+    
+    
     function updateClientPath(hitResultPath) {
       var toPass = JSON.stringify(hitResultPath); //what we want to pass to the websocket
       console.log("THE PATH BEFORE ITS SENT ::: ", path);
       socket.send(toPass);
     }
   
-  function updateClientMovePath(hitReasultPath) {
-    
-  }
+  
     
     
     
     
     tool.onMouseDrag = function(event) {
+      
+      //segment piece not important
     if (segment) {
       segment.point += event.delta;
       path.smooth();
     }
+      
+      
+      
     else if (path) {
+      
       
       makeMouseDragTwo(event.point, path.id);
       //console.log("what is da path: " + path + " " + path.id);
@@ -262,6 +270,15 @@
     }
     
     
+  }
+    
+    function makeMouseDragTwo(eventPoint, id) {
+      var flag = [-2];
+      flag.push(id);
+      flag.push(eventPoint);
+      socket.send(JSON.stringify(flag));
+      console.log("STRINGIFYD FOR FLAG OF MOUSEDRAG");
+      console.log(JSON.stringify(flag));
   }
   
   
@@ -358,7 +375,7 @@
     
     if (s[0] == 'Path') {
       console.log("HERE WE ARE SENDING THE PATH JSON!!! EXCITING!!!");
-      path = paper.importJSON(data.data);
+      //path = paper.importJSON(data.data);
       console.log("THE PATH INSIDE OF SOCKET ONMESSAGE ON UPDATE ::::", path);
       paper.project.activeLayer.addChild(paper.importJSON(data.data));
       
@@ -425,13 +442,22 @@
         
         //mouseDrag socketSend
       case -2:
+        console.log("all paths array::: ", allLEGOS);
+        
+        console.log("THE PATH IN CASE -2 IS :::: ", path);
+        console.log("PATH ID IS :: ", path.id);
 
         var b = new paper.Point(s[2][1], s[2][2]); 
         var ID = s[1]
+        console.log("ID SENT BY JSON IS::: ", ID);
         var newpath = paper.project.getItems({
         id: ID
         
       });
+        
+        //so this is making a new point, and then taking the ID, and getting the item based off of ID, and assigning
+        //to it a new location. Now since this isnt *happening* on any screen, it must be getting the wrong ID,
+        
         
         
         //*** testing path IDs
@@ -507,12 +533,7 @@
     console.log("BEFORE RETURN<> SEGMENT PATH movePAth: ", segment, path, movePath);
     return [segment, path, movePath];
   }
-  function makeMouseDragTwo(eventPoint, id) {
-    var flag = [-2];
-    flag.push(id);
-    flag.push(eventPoint);
-    socket.send(JSON.stringify(flag));
-  }
+
   
   //
   
