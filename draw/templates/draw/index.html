@@ -69,8 +69,7 @@
         margin-top: 10px;
         justify-content: space-evenly;
       }
-      
-      
+  
     </style>
 
 </head>
@@ -300,7 +299,7 @@
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
     flag.push(allLEGOS);
-    flag.push(getRandomID());
+    flag.push(getRandomColor());
     console.log("flag after adding lego piece: " + flag)
     return flag;
     
@@ -407,7 +406,7 @@
       case 3:
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
-        newSP.fillColor = getRandomColor();
+        newSP.fillColor = s[4];
         s[3].push(newMP);
         return newSP;
         break;
