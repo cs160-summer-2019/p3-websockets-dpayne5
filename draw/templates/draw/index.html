@@ -147,6 +147,7 @@
     flag.push(event.clientX);
     flag.push(event.clientY - 100);
     flag.push(allLEGOS);
+    flag.push(getRandomID);
     console.log("flag after adding lego piece: " + flag)
     return flag;
   }
@@ -179,9 +180,9 @@
   }
   
   function createSmallPiece() {
-    console.log("printing out all lego arrays:" + allLEGOS);
+    //console.log("printing out all lego arrays:" + allLEGOS);
     socket.send(JSON.stringify(makeFlagArray(2)));
-    console.log("after adding:" + allLEGOS);
+    //console.log("after adding:" + allLEGOS);
   }
   
   function createMidPiece() {
@@ -209,22 +210,33 @@
       }
       return color;
     }
+  
+  //IDEA::: add to block creation a random ID that is the same across the board for each piece
+  function getRandomID() {
+    var randID = Math.floor((Math.random() * 10000000) % 1000);
+    return randID;
+  }
+  
+  
+  
   //socket function, intended to be VERY large. Has switch cases for just about everything
   socket.onmessage = function(data) {
     
     var s = JSON.parse(data.data);
-    console.log(s);
     
     var x = parseInt(s[1]);
     var y = parseInt(s[2]);
     
     switch (parseInt(s[0])) {
+        //making a new LargeLego
       case 1:
+        console.log(s);
         var newLP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(400,50));
         newLP.fillColor = getRandomColor();
         s[3].push(newLP);
         
         break;
+        //making new medium lego
       case 2:
         //do stuff
         var newMP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,50));
@@ -232,6 +244,7 @@
         s[3].push(newMP);
         return newMP;
         break;
+        //making new smallLego
       case 3:
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
@@ -239,6 +252,7 @@
         s[3].push(newMP);
         return newSP;
         break;
+        //making new LargeSquare
       case 4:
         //do stuff
         var newLS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,200));
@@ -246,6 +260,7 @@
         newLS.fillColor = getRandomColor();
         return newLS;
         break;
+        //making new SmallSquare
       case 5:
         //do stuff
         var newSS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,100));
@@ -253,32 +268,34 @@
         newSS.fillColor = getRandomColor();
         return newSS;
         break;
+        
+        //undo button, currently not working
       case 6:
-        // *** currently the undo button does NOT work
-        //do stuff
-        //allLEGOS[allLEGOS.length -1].fillColor = 'white';
+        
         s[3][s[3].length -1].fillColor = 'white';
         var toDelete = s[3].pop();
         var toDelete = new paper.Path;    
         break;
 
+        //mouseDown socketSend
       case -1:
         socketMOUSEDOWN(s[3], s[4], s[5], s[6], s[7], s[8], s[9]);
         
         break;
+        
+        //mouseDrag socketSend
       case -2:
-        //here we do things for mouseDrag
-        
-        
-        //ok, these two lines are good. A new point is made, nothing special, now need the path
-        var b = new paper.Point(s[2][1], s[2][2]);
-        
+
+        var b = new paper.Point(s[2][1], s[2][2]); 
         var ID = s[1]
-        
         var newpath = paper.project.getItems({
         id: ID
         
       });
+        
+        
+        //*** testing path IDs
+        console.log("PATH ID IS,    : ", path.id);
         
         
         path.position = b;
@@ -315,8 +332,6 @@
   function socketMOUSEDOWN(eventpoint, modifiers, segment, path, movePath, allLEGOS, eventItem) {
     segment = path = null;
     
-    
-    
     //var hitResult = paper.project.hitTest(eventpoint, hitOptions);
     //before was event.point
     var hitResult = eventItem[1];
@@ -332,8 +347,7 @@
     
     if (hitResult) {
 		path = hitResult.item;
-      console.log("AFTER PATH GETS ASSIGNED TO");
-      console.log(path)
+      console.log("HIT RESULT ITEM IS ::: ", hitResult.item);
 		if (hitResult.type == 'segment') {
 			segment = hitResult.segment;
 		} else if (hitResult.type == 'stroke') {
@@ -372,15 +386,17 @@
     var s = event;
     console.log("on mousedown checking event.item");
     console.log(event.item);
-    
-    //lets try passing this event.item
-
-    //socket.send(JSON.stringify(makeMouseDownSocketArray(s)));
-    
+        
     segment = path = null;
     
     
     var hitResult = paper.project.hitTest(event.point, hitOptions);
+    
+    //here
+    
+    
+    //lets try and send this hit result through.....
+    console.log(hitResult);
     //looking at results of hitResult;
     //here this is initialize {'fill } etc etc....so this is the problem
     console.log(hitResult);
@@ -393,7 +409,6 @@
     if (event.modifiers.shift) {
       
       if (hitResult.type == 'segment') {
-        console.log("************EVENTMOD SHIFT AND SEGMENT ********")
         hitResult.segment.remove();
       }
     }
@@ -413,6 +428,14 @@
     
     if (hitResult) {
       path = hitResult.item;
+      //need to send to the socket that path = this item *** IMPORTANT ***
+      console.log("HIT RESULT ITEM IS:::", hitResult.item);
+      //console.log(hitResult.item.id);
+      console.log("HIT RESULT ITEM ID IS :::", hitResult.item.id);
+      
+      
+      
+      
       if (hitResult.type == 'segment') {
         console.log("************EVENTMOD SEGMENT********")
         segment = hitResult.segment;
@@ -431,102 +454,9 @@
     } 
 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    //Below is the original, which works only in your current browser!
-    
-    /*
-    segment = path = null;
-    
-    
-    var hitResult = paper.project.hitTest(event.point, hitOptions);
-    //looking at results of hitResult;
-    //here this is initialize {'fill } etc etc....so this is the problem
-    
-    if (!hitResult) {
-      return;
-    }
-    
-    if (event.modifiers.shift) {
-      if (hitResult.type == 'segment') {
-        hitResult.segment.remove();
-      }
-    }
-    
-    if (hitResult) {
-		path = hitResult.item;
-		if (hitResult.type == 'segment') {
-			segment = hitResult.segment;
-		} else if (hitResult.type == 'stroke') {
-			var location = hitResult.location;
-			segment = path.insert(location.index + 1, event.point);
-			path.smooth();
-		}
-	}
-    
-    if (hitResult) {
-      path = hitResult.item;
-      if (hitResult.type == 'segment') {
-        segment = hitResult.segment;
-      }
-      else if (hitResult.type == 'stoke') { //this should be the hit result.segment deal
-        var location = hitResult.location;
-        segment = path.insert(location.index+1, event.point);
-        path.smooth();
-      }
-      
-      movePath = hitResult.type == 'fill';
-      if (movePath) {
-        paper.project.activeLayer.addChild(hitResult.item);
-      }
-    } 
-    */
-    
   }
   
   
-  /* dont need, trash */
-  function socketMOUSEDRAG(eDelta, ePoint, segment, path) {
-    if (segment) {
-      segment.point += eDelta;
-      path.smooth();
-    }
-    else if (path) {
-      path.position = ePoint;
-    }
-    paper.view.draw();
-  }
-  
-  
-  //dont need, trash
-  /*
-  function makeMouseDragSocketArray(event) {
-    var flag = [-2];
-    flag.push(event.point.x);
-    flag.push(event.point.y);
-    flag.push(event.point);
-    flag.push(event.delta);
-    flag.push(segment);
-    flag.push(path);
-    return flag;
-    
-  }
-  */
   
   
   function makeMouseDragTwo(eventPoint, id) {
@@ -553,133 +483,6 @@
     
   }
   
-  //old work from p3 implementations
-  /*
-
-    // setting up the canvas and one paper tool
-    var canvas = document.getElementById('myCanvas');
-    paper.setup(canvas);
-    var tool = new paper.Tool();
-  
-  var count = 0;
-
-    // getting the URL (you may want to use for Exercise 3)
-    var url = window.location.href;
-
-  
-    var socket = new WebSocket('wss://p3-websockets-dpayne5-dpayne589733.codeanyapp.com/ws/draw');
-    var colors = ['black', 'green', 'red', 'pink', 'orange', 'purple', 'magenta', 'cyan', 'blue', 'gray'];
-    
-  var publicPath = new paper.Path();
-  var isSmall = false;
-  
-  
-  //array of paths, for the multiple users, 
-  var peopleArray = [];
-  
-  for (i = 0; i < colors.length; i++) {
-    peopleArray.push(new paper.Path());
-  }
-  
-  var randomIndex = Math.floor((Math.random() * 10000) % colors.length);
-    //publicPath.strokeColor = colors[randomIndex];
-  
-  
-  //1C implementation here
-  
-  
-  
-  if (url == "https://p3-websockets-dpayne5-dpayne589733.codeanyapp.com/draw/?size-small") {
-    isSmall = true;
-    
-    for (i=0; i< peopleArray.length; i++) {
-      if (i != randomIndex) {
-        peopleArray[i].visible = false;
-      }
-    }
-    
-    
-  }
-  
-  tool.onMouseDown = function(event) {
-    
-    peopleArray[randomIndex] = new paper.Path();
-    
-    //here have to make another socket send to flag if the thing is small
-    
-    var oneCdata = "[" + -2 + "," + randomIndex + "]";
-    
-    socket.send(oneCdata)
-    
-  }
-  
-  tool.onMouseDrag = function(event) {
-    
-      var d = JSON.stringify(event.point);
-      d = d.substring(0, d.length -1);
-      d = d + ',"' + colors[randomIndex] + '",' + randomIndex +']';
-    
-      socket.send(d);
-    
-
-  }
-  
-  tool.onMouseUp = function(event) {
-    //publicPath = new paper.Path();
-    //publicPath.strokeColor = 'white';
-    
-    peopleArray[randomIndex] = new paper.Path();
-    
-    var passFlag = "["+ randomIndex + ',' + -1 + "]";
-    socket.send(passFlag);
-    
-    //on mouse Up send a thing to the other arrays, and make sure the new piece is cleared.
-    
-  }
-  
-    socket.onmessage = function(data) {
-      var c = JSON.parse(data.data);
-      
-      
-      
-      if (c[0] == -2) {
-        if (isSmall && c[1] != randomIndex) {
-          peopleArray[c[1]].visible = false;
-          
-        }
-      }
-      
-      if (c[1] == -1) {
-        peopleArray[c[0]] = new paper.Path();
-        return;
-      }
-      
-      
-      if (count == 0) {
-        peopleArray[c[4]] = new paper.Path();
-        peopleArray[c[4]].strokeColor = 'white';
-        
-        
-      }
-      else if (count == 1) {
-        peopleArray[c[4]].removeSegment(peopleArray[c[4]].segments.length -1);
-      }
-      else if (count > 1) {
-        //var c = JSON.parse(data.data);
-      peopleArray[c[4]].strokeColor = c[3];
-      peopleArray[c[4]].add(new paper.Point(c[1],c[2]));
-        
-        
-        
-      }
-      
-      
-      count = count + 1;
-      paper.view.draw();
-      
-      
-    }
-    */
 
 </script>
 </html>
