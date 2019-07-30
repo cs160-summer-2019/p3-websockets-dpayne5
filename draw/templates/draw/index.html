@@ -5,7 +5,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>P4 Drawing</title>
-
+    <link href="https://fonts.googleapis.com/css?family=Rubik:700i&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'draw/vendor/bootstrap/css/bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'draw/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
@@ -52,18 +52,35 @@
       
       .buttonContainer {
         margin: 0 auto;
-        margin-bottom: 20px;
-        
+        /*margin-bottom: 20px;*/
         width: 95%;
         display: flex;
         flex-direction: row;
         justify-content:space-around;
-        margin-top: 20px;
+        /*margin-top: 20px;*/
+        background: rgba(255, 219, 207, 0.66);
       }
       
       .button {
-        
-        
+        /*position: absolute;*/
+        width: 147px;
+        height: 51px;
+        left: 1148px;
+        top: 750px;
+
+        background: #DACED9;
+        border: 3px solid #BACDE9;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        border-radius: 10px;     
+      }
+      
+      .legoText {
+        font-family: 'Rubik', sans-serif;
+        font-weight: 900;
+        font-size: 20px;
+        line-height: 24px;
+        text-align: center;
+        color: #FFFFFF;
       }
       .imageContainer {
         border: 2px solid green;
@@ -72,6 +89,29 @@
         display: flex;
         margin-top: 10px;
         justify-content: space-evenly;
+      }
+      
+      
+      .toolContainer {
+        display: flex;
+        flex-direction: column;
+        
+      }
+      
+      .counterContainer {
+        margin: 0 auto;
+        width: 95%;
+        height: 50px;
+        margin-top: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content:space-around;
+      }
+      
+      .counterItem {
+        text-align: center;
+        width:50px;
+        height: 50px;
       }
       
       
@@ -86,48 +126,105 @@
   <!--The "toolbar" which holds the different types of legos, div classes currently have placeholders,
         they will have buttons eventually which create new paper objects maybe in the bottom corner, and an undo button-->
   
-  <div class="buttonContainer">
-    <button onclick="createLargePiece()" class="largepiece">
-         Large LEGO
+  
+  
+  
+  
+  <!-- creating the double layered toolbar. The goal is to have a flex display column, where the first "column is a spanning row
+       which contains all of our buttons to create new legos. The bottom "column" contains all the counts of remaining blocks"
+
+       below is the original HTML code in case we want to revert.below
+
+<div class="buttonContainer">
+    <button class="button" onclick="createLargePiece()" class="largepiece">
+         <p class="legoText">
+           Large LEGO
+      </p>
       </button>
-    <button onclick="createMidPiece()" class="largepiece">
-         Medium LEGO
+    <button class="button" onclick="createMidPiece()" class="largepiece">
+         <p class="legoText">
+           Medium LEGO
+      </p>
       </button>
-    <button onclick="createSmallPiece()" class="largepiece">
-         Small LEGO
+    <button class="button" onclick="createSmallPiece()" class="largepiece">
+         <p class="legoText">
+           Small LEGO
+      </p>
       </button>
-    <button onclick="createLargeSquare()" class="largepiece">
-         Large Square
+    <button class="button" onclick="createLargeSquare()" class="largepiece">
+         <p class="legoText">
+           Large Square
+      </p>
       </button>
-    <button onclick="createSmallSquare()" class="largepiece">
-         Small Square
+    <button class="button" onclick="createSmallSquare()" class="largepiece">
+        <p class="legoText">
+          Small Square
+      </p> 
       </button>
     
-    <!--
-    <button onclick="undo()">
-         Undo
-      </button> -->
     
   </div>
-  <!--  ** Scrapping for now, not lining up visually and spending too much time on this **
-  <div class="imageContainer">
+      
+   -->
+  
+  
+  <!-- new code 7/29 7pm -->
+  <div class="toolContainer">
     
-    
-    <div class="largeImage imageForClick"></div>
-    <div class="mediumImage imageForClick"></div>
-    <div class="smallImage imageForClick"></div>
-    <div class="largeSimage imageForClick"></div>
-    <div class="smallSimage imageForClick"></div>
-    
+    <div class="buttonContainer">
+    <button class="button" onclick="createLargePiece()" class="largepiece">
+         <p class="legoText">
+           Large LEGO
+      </p>
+      </button>
+    <button class="button" onclick="createMidPiece()" class="largepiece">
+         <p class="legoText">
+           Medium LEGO
+      </p>
+      </button>
+    <button class="button" onclick="createSmallPiece()" class="largepiece">
+         <p class="legoText">
+           Small LEGO
+      </p>
+      </button>
+    <button class="button" onclick="createLargeSquare()" class="largepiece">
+         <p class="legoText">
+           Large Square
+      </p>
+      </button>
+    <button class="button" onclick="createSmallSquare()" class="largepiece">
+        <p class="legoText">
+          Small Square
+      </p> 
+      </button>
     
     
   </div>
-  -->
+    <div class="counterContainer">
+      <div class="counterItem">10</div>
+      <div class="counterItem">10</div>
+      <div class="counterItem">10</div>
+      <div class="counterItem">10</div>
+      <div class="counterItem">10</div>
+    </div>
+
+  </div>
+  
+ 
   
 </body>
 <script>
   
   //*** server is running HERE: http://p3-websockets-dpayne5-dpayne589733.codeanyapp.com:3000/draw/ *********
+  
+  
+  //need to create new variables to tie to each block button
+  var largeCount = 10, smallCount = 10, medCount = 10, largeSquareCount = 10, smallSquareCount = 10;
+  
+  
+  //need to tie each of these to functions which are called on earlier button click.... which can be our create functions
+  //from earlier
+  
 
   var allLEGOS = [];
   var canvas = document.getElementById('myCanvas');
@@ -149,35 +246,7 @@
   };
   
     tool.onMouseDown = function(event) {
-      
-      /*
-      //NEW THINGS HERE *********
-      
-      segment = path = null;
-      var hitResult = paper.project.hitTest(event.point, hitOptions);
-      
-      if (!hitResult) {
-          return;
-          }
-      
-      //taken care of
-      if (hitResult) {
-        path = hitResult.item;
-        //socket send hitResult.item;
-        updateClientPath(hitResult.item); //currently doesnt work, gives back a different ID from the item imported, also not the same
-      }
-      
-      movePath = hitResult.type == 'fill';
-      if (movePath) {
-        paper.project.activeLayer.addChild(hitResult.item);
-        
-        //socket send to make this happen across clients as well
-      }
-      
-      // ******** END OF NEW THINGS
-      
-      */ 
-      //OLD WORKING-ISH CODE BELOW ********
+    
   
       var s = event;
     segment = path = null;
@@ -250,11 +319,6 @@
 
     
   }
-    
-    
-    
-    //get the ID of the hitResult
-    //send the ID to the socket onmessage
     
     
     function updateClientPath(hitResultPath) {
@@ -348,26 +412,49 @@
     
   }
   
+  //in each of these have to tie the pieces into updating.
+  
   function createLargePiece() {
+    if (largeCount == 0) {
+      return;
+    }
     socket.send(JSON.stringify(makeFlagArray(1))); 
+    largeCount -= 1;
   }
   function createSmallPiece() {
-    //console.log("printing out all lego arrays:" + allLEGOS);
+    if (smallCount == 0) {
+      return;
+    }
     socket.send(JSON.stringify(makeFlagArray(2)));
-    //console.log("after adding:" + allLEGOS);
+    smallCount -= 1;
   }
   function createMidPiece() {
+    if (medCount == 0) {
+      return;
+    }
     socket.send(JSON.stringify(makeFlagArray(3))); 
+    medCount -= 1;
   }
   function createLargeSquare() {
+    if (largeSquareCount == 0) {
+      return;
+    }
     socket.send(JSON.stringify(makeFlagArray(4))); 
+    largeSquareCount -= 1;
   }
   function createSmallSquare() {
+    if (smallSquareCount == 0) {
+      return;
+    }
     socket.send(JSON.stringify(makeFlagArray(5))); 
+    smallSquareCount -= 1;
   }
+  
+  /*
   function undo() {
     socket.send(JSON.stringify(makeFlagArray(6))); 
-  }
+  } 
+  */
       
   //generate random colors function
   function getRandomColor() {
@@ -433,7 +520,7 @@
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
         newSP.fillColor = s[4];
-        allLEGOS.push(newSP);
+        allLEGOS.push(newSP); 
         return newSP;
         break;
         //making new LargeSquare
