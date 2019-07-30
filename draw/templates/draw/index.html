@@ -20,10 +20,14 @@
         flex-direction: column;
     }
       #myCanvas {
+        
         height: 700px;
         width: 95%;
         margin: 0 auto;
         background: linear-gradient(180deg, rgba(149, 147, 226, 0.83) 0%, rgba(212, 252, 221, 0.971139) 83.01%, #CDFCD7 99.99%, rgba(255, 255, 255, 0.78) 100%), #399E7A;
+        
+        margin-top: 5px;
+        
       }
       
       /* This will be the bar to choose legos to drop onto the screen. */
@@ -98,7 +102,7 @@
         
       }
       
-      .counterContainer {
+      #counterContainer {
         margin: 0 auto;
         width: 95%;
         height: 50px;
@@ -106,6 +110,7 @@
         display: flex;
         flex-direction: row;
         justify-content:space-around;
+        opacity: 0;
       }
       
       .counterItem {
@@ -114,12 +119,31 @@
         height: 50px;
       }
       
+      .variantBAR {
+        border: 2px solid purple;
+        width: 95%;
+        height: 30px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-around;
+      }
+      
       
     </style>
 
 </head>
 <body>
     <!-- You may change the dimensions of this canvas -->
+  <div class="variantBAR">
+    <button onclick="toggleBLOCKSLEFT()">
+      Variant: Blocks Left
+    </button>
+    
+    <button onclick="toggleEXAMPLEIMAGE()">
+      Variant: Example Image
+    </button>
+    
+  </div>
     <canvas id="myCanvas">
   </canvas>
   
@@ -200,12 +224,12 @@
     
     
   </div>
-    <div class="counterContainer">
-      <div class="counterItem">10</div>
-      <div class="counterItem">10</div>
-      <div class="counterItem">10</div>
-      <div class="counterItem">10</div>
-      <div class="counterItem">10</div>
+    <div id="counterContainer">
+      <div class="counterItem" id="largeCOUNT">10</div>
+      <div class="counterItem" id="medCOUNT">10</div>
+      <div class="counterItem" id="smallCOUNT">10</div>
+      <div class="counterItem" id="largeSQUARECOUNT">10</div>
+      <div class="counterItem" id="smallSQUARECOUNT">10</div>
     </div>
 
   </div>
@@ -224,6 +248,37 @@
   
   //need to tie each of these to functions which are called on earlier button click.... which can be our create functions
   //from earlier
+  
+  
+  
+  //meant to wrap the entire project. Add buttons to toggle these on off
+  var variantBLOCKSLEFT = false;
+  var variantEXAMPLEPIC = false;
+  
+  function toggleBLOCKSLEFT() {
+    
+    variantBLOCKSLEFT = !variantBLOCKSLEFT
+    
+    
+    if (variantBLOCKSLEFT) {
+      var field = document.getElementById('counterContainer');
+      
+      console.log(field);
+      field.style.opacity = 1;
+      
+    }
+    
+  }
+  
+  
+  function toggleEXAMPLEIMAGE() {
+    
+  }
+  
+  
+  //the entire counter divshould be invisible to start with, turn it on if the other piece is active, ie VariantBLOCKS left = true
+  
+  
   
 
   var allLEGOS = [];
@@ -382,13 +437,7 @@
     return flag;
   }
  
-  
-  
-  
-  
-  
-  
-  
+ 
   
   function makeMouseDownSocketArray(event) {
     
@@ -414,40 +463,93 @@
   
   //in each of these have to tie the pieces into updating.
   
+  
+  //this will grey out the div container when the value becomes 0;
+  function greyOutDiv() {
+    
+  }
+  
+  
+  function updateCounter(fieldName, counter) {
+    
+    var field = document.getElementById(fieldName);    
+    field.innerHTML = counter.toString();
+    counter -= 1;
+  }
+  
   function createLargePiece() {
+    
+    var field = document.getElementById('largeCOUNT');
+
     if (largeCount == 0) {
+      
       return;
     }
     socket.send(JSON.stringify(makeFlagArray(1))); 
-    largeCount -= 1;
+    
+    if (variantBLOCKSLEFT) {
+      largeCount -= 1;
+      field.innerHTML = largeCount.toString();
+    }
+    
   }
   function createSmallPiece() {
+    var field = document.getElementById('smallCOUNT');
     if (smallCount == 0) {
       return;
+      
     }
     socket.send(JSON.stringify(makeFlagArray(2)));
-    smallCount -= 1;
+    
+    if (variantBLOCKSLEFT) {
+      smallCount -= 1;
+    field.innerHTML = smallCount.toString();
+      
+    }
+    
   }
   function createMidPiece() {
+    var field = document.getElementById('medCOUNT');
     if (medCount == 0) {
       return;
     }
     socket.send(JSON.stringify(makeFlagArray(3))); 
-    medCount -= 1;
+    
+    if (variantBLOCKSLEFT) {
+      medCount -= 1;
+    field.innerHTML = medCount.toString();
+      
+    }
+    
   }
   function createLargeSquare() {
+    var field = document.getElementById('largeSQUARECOUNT');
     if (largeSquareCount == 0) {
       return;
     }
-    socket.send(JSON.stringify(makeFlagArray(4))); 
-    largeSquareCount -= 1;
+    socket.send(JSON.stringify(makeFlagArray(4)));
+    
+    if (variantBLOCKSLEFT) {
+      largeSquareCount -= 1;
+    field.innerHTML = largeSquareCount.toString();
+      
+    }
+    
+    
   }
   function createSmallSquare() {
+    var field = document.getElementById('smallSQUARECOUNT');
     if (smallSquareCount == 0) {
       return;
     }
     socket.send(JSON.stringify(makeFlagArray(5))); 
-    smallSquareCount -= 1;
+    
+    if (variantBLOCKSLEFT) {
+      smallSquareCount -= 1;
+    field.innerHTML = smallSquareCount.toString();
+      
+    }
+    
   }
   
   /*
@@ -643,15 +745,6 @@
     //need to return [segment, path, movepath]
     return [segment, path, movePath];
   }
-
-  
-  //
-  
-  
-  
-  
-  
-  
 
 </script>
 </html>
