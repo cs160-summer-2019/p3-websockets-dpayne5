@@ -102,26 +102,25 @@
         left: 150px;
       }
       
+      .open-model {
+        top: 500px;
+        right: 0px;
+        width:90px;
+        height:90px;
+      }
+      
     </style>
 
 </head>
 <body>
-   <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      
-    </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <a class="dropdown-item" href="profile.html">Action</a>
-      <a class="dropdown-item" href="#">Another action</a>
-      <a class="dropdown-item" href="#">Something else here</a>
-    </div>
+  <div class="model-overlay">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeModel()"></a>
   </div>
+ <button class="open-model" onclick="openModel()">
+   <i class="fab fa-simplybuilt"></i>
+  </button>
     <!-- You may change the dimensions of this canvas -->
-    <canvas id="myCanvas">
-        <div class="profile">
-     <i class="fas fa-user"></i>
-  </div>
-  </canvas>
+    <canvas id="myCanvas"></canvas>
   
   <!--The "toolbar" which holds the different types of legos, div classes currently have placeholders,
         they will have buttons eventually which create new paper objects maybe in the bottom corner, and an undo button-->
