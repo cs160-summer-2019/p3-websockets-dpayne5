@@ -10,26 +10,29 @@
     <script type="text/javascript" src="{% static 'draw/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
   <script type="text/javascript" src="https://cdn.rawgit.com/alexgibson/shake.js/master/shake.js"></script>
-  
+  <script src="https://kit.fontawesome.com/258137d1e0.js"></script>
     <style type="text/css">
       
       /* Body element, flex display, justify content center, to center all following content*/
       body {
+        overflow: hidden;
         display: flex;
         justify-content: center;
         flex-direction: column;
+        background: linear-gradient(180deg, rgba(149, 147, 226, 0.83) 0%, rgba(212, 252, 221, 0.971139) 83.01%, #CDFCD7 99.99%, rgba(255, 255, 255, 0.78) 100%), #399E7A;
     }
       #myCanvas {
-        
         height: 700px;
-        width: 95%;
+        width: 80%;
         margin: 0 auto;
-        background: linear-gradient(180deg, rgba(149, 147, 226, 0.83) 0%, rgba(212, 252, 221, 0.971139) 83.01%, #CDFCD7 99.99%, rgba(255, 255, 255, 0.78) 100%), #399E7A;
-        
-        margin-top: 5px;
-        
       }
       
+      .profile {
+        height: 400px;
+        width: 400px;
+        top: 50px;
+        right: 50px;
+      }
       /* This will be the bar to choose legos to drop onto the screen. */
       .legoBAR {
         margin-top: 20px;
@@ -96,69 +99,30 @@
       }
       
       
-      .toolContainer {
-        display: flex;
-        flex-direction: column;
-        
-      }
-      
-      #counterContainer {
-        margin: 0 auto;
-        width: 95%;
-        height: 50px;
-        margin-top: 10px;
-        display: flex;
-        flex-direction: row;
-        justify-content:space-around;
-        opacity: 0;
-      }
-      
-      .counterItem {
-        text-align: center;
-        width:50px;
-        height: 50px;
-      }
-      
-      .variantBAR {
-        width: 95%;
-        height: 30px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-around;
-      }
-      
-      
     </style>
 
 </head>
 <body>
-    <!-- You may change the dimensions of this canvas -->
-  <div class="variantBAR">
-    <button onclick="toggleBLOCKSLEFT()">
-      Variant: Blocks Left
-    </button>
-    
-    <button onclick="toggleEXAMPLEIMAGE()">
-      Variant: Example Image
-    </button>
-    
+  <div class="btn-group">
+  <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Right-aligned menu
+  </button>
+  <div class="dropdown-menu dropdown-menu-right">
+    <button class="dropdown-item" type="button">Action</button>
+    <button class="dropdown-item" type="button">Another action</button>
+    <button class="dropdown-item" type="button">Something else here</button>
   </div>
+</div>
+    <!-- You may change the dimensions of this canvas -->
     <canvas id="myCanvas">
+        <div class="profile">
+     <i class="fas fa-user"></i>
+  </div>
   </canvas>
   
   <!--The "toolbar" which holds the different types of legos, div classes currently have placeholders,
         they will have buttons eventually which create new paper objects maybe in the bottom corner, and an undo button-->
-  
-  
-  
-  
-  
-  <!-- creating the double layered toolbar. The goal is to have a flex display column, where the first "column is a spanning row
-       which contains all of our buttons to create new legos. The bottom "column" contains all the counts of remaining blocks"
-
-       below is the original HTML code in case we want to revert.below
-
-<div class="buttonContainer">
+  <div class="buttonContainer">
     <button class="button" onclick="createLargePiece()" class="largepiece">
          <p class="legoText">
            Large LEGO
@@ -185,100 +149,31 @@
       </p> 
       </button>
     
+    <!--
+    <button onclick="undo()">
+         Undo
+      </button> -->
     
   </div>
-      
-   -->
-  
-  
-  <!-- new code 7/29 7pm -->
-  <div class="toolContainer">
+  <!--  ** Scrapping for now, not lining up visually and spending too much time on this **
+  <div class="imageContainer">
     
-    <div class="buttonContainer">
-    <button class="button" onclick="createLargePiece()" class="largepiece">
-         <p class="legoText">
-           Large LEGO
-      </p>
-      </button>
-    <button class="button" onclick="createMidPiece()" class="largepiece">
-         <p class="legoText">
-           Medium LEGO
-      </p>
-      </button>
-    <button class="button" onclick="createSmallPiece()" class="largepiece">
-         <p class="legoText">
-           Small LEGO
-      </p>
-      </button>
-    <button class="button" onclick="createLargeSquare()" class="largepiece">
-         <p class="legoText">
-           Large Square
-      </p>
-      </button>
-    <button class="button" onclick="createSmallSquare()" class="largepiece">
-        <p class="legoText">
-          Small Square
-      </p> 
-      </button>
+    
+    <div class="largeImage imageForClick"></div>
+    <div class="mediumImage imageForClick"></div>
+    <div class="smallImage imageForClick"></div>
+    <div class="largeSimage imageForClick"></div>
+    <div class="smallSimage imageForClick"></div>
+    
     
     
   </div>
-    <div id="counterContainer">
-      <div class="counterItem" id="largeCOUNT">10</div>
-      <div class="counterItem" id="medCOUNT">10</div>
-      <div class="counterItem" id="smallCOUNT">10</div>
-      <div class="counterItem" id="largeSQUARECOUNT">10</div>
-      <div class="counterItem" id="smallSQUARECOUNT">10</div>
-    </div>
-
-  </div>
-  
- 
+  -->
   
 </body>
+
 <script>
-  
   //*** server is running HERE: http://p3-websockets-dpayne5-dpayne589733.codeanyapp.com:3000/draw/ *********
-  
-  
-  //need to create new variables to tie to each block button
-  var largeCount = 10, smallCount = 10, medCount = 10, largeSquareCount = 10, smallSquareCount = 10;
-  
-  
-  //need to tie each of these to functions which are called on earlier button click.... which can be our create functions
-  //from earlier
-  
-  
-  
-  //meant to wrap the entire project. Add buttons to toggle these on off
-  var variantBLOCKSLEFT = false;
-  var variantEXAMPLEPIC = false;
-  
-  function toggleBLOCKSLEFT() {
-    
-    variantBLOCKSLEFT = !variantBLOCKSLEFT
-    
-    
-    if (variantBLOCKSLEFT) {
-      var field = document.getElementById('counterContainer');
-      
-      console.log(field);
-      field.style.opacity = 1;
-      
-    }
-    
-  }
-  
-  
-  function toggleEXAMPLEIMAGE() {
-    
-  }
-  
-  
-  //the entire counter divshould be invisible to start with, turn it on if the other piece is active, ie VariantBLOCKS left = true
-  
-  
-  
 
   var allLEGOS = [];
   var canvas = document.getElementById('myCanvas');
@@ -300,7 +195,35 @@
   };
   
     tool.onMouseDown = function(event) {
-    
+      
+      /*
+      //NEW THINGS HERE *********
+      
+      segment = path = null;
+      var hitResult = paper.project.hitTest(event.point, hitOptions);
+      
+      if (!hitResult) {
+          return;
+          }
+      
+      //taken care of
+      if (hitResult) {
+        path = hitResult.item;
+        //socket send hitResult.item;
+        updateClientPath(hitResult.item); //currently doesnt work, gives back a different ID from the item imported, also not the same
+      }
+      
+      movePath = hitResult.type == 'fill';
+      if (movePath) {
+        paper.project.activeLayer.addChild(hitResult.item);
+        
+        //socket send to make this happen across clients as well
+      }
+      
+      // ******** END OF NEW THINGS
+      
+      */ 
+      //OLD WORKING-ISH CODE BELOW ********
   
       var s = event;
     segment = path = null;
@@ -375,6 +298,11 @@
   }
     
     
+    
+    //get the ID of the hitResult
+    //send the ID to the socket onmessage
+    
+    
     function updateClientPath(hitResultPath) {
       var toPass = JSON.stringify(hitResultPath); //what we want to pass to the websocket
       var flag = [-10];
@@ -436,7 +364,13 @@
     return flag;
   }
  
- 
+  
+  
+  
+  
+  
+  
+  
   
   function makeMouseDownSocketArray(event) {
     
@@ -460,102 +394,26 @@
     
   }
   
-  //in each of these have to tie the pieces into updating.
-  
-  
-  //this will grey out the div container when the value becomes 0;
-  function greyOutDiv() {
-    
-  }
-  
-  
-  function updateCounter(fieldName, counter) {
-    
-    var field = document.getElementById(fieldName);    
-    field.innerHTML = counter.toString();
-    counter -= 1;
-  }
-  
   function createLargePiece() {
-    
-    var field = document.getElementById('largeCOUNT');
-
-    if (largeCount == 0) {
-      
-      return;
-    }
     socket.send(JSON.stringify(makeFlagArray(1))); 
-    
-    if (variantBLOCKSLEFT) {
-      largeCount -= 1;
-      field.innerHTML = largeCount.toString();
-    }
-    
   }
   function createSmallPiece() {
-    var field = document.getElementById('smallCOUNT');
-    if (smallCount == 0) {
-      return;
-      
-    }
+    //console.log("printing out all lego arrays:" + allLEGOS);
     socket.send(JSON.stringify(makeFlagArray(2)));
-    
-    if (variantBLOCKSLEFT) {
-      smallCount -= 1;
-    field.innerHTML = smallCount.toString();
-      
-    }
-    
+    //console.log("after adding:" + allLEGOS);
   }
   function createMidPiece() {
-    var field = document.getElementById('medCOUNT');
-    if (medCount == 0) {
-      return;
-    }
     socket.send(JSON.stringify(makeFlagArray(3))); 
-    
-    if (variantBLOCKSLEFT) {
-      medCount -= 1;
-    field.innerHTML = medCount.toString();
-      
-    }
-    
   }
   function createLargeSquare() {
-    var field = document.getElementById('largeSQUARECOUNT');
-    if (largeSquareCount == 0) {
-      return;
-    }
-    socket.send(JSON.stringify(makeFlagArray(4)));
-    
-    if (variantBLOCKSLEFT) {
-      largeSquareCount -= 1;
-    field.innerHTML = largeSquareCount.toString();
-      
-    }
-    
-    
+    socket.send(JSON.stringify(makeFlagArray(4))); 
   }
   function createSmallSquare() {
-    var field = document.getElementById('smallSQUARECOUNT');
-    if (smallSquareCount == 0) {
-      return;
-    }
     socket.send(JSON.stringify(makeFlagArray(5))); 
-    
-    if (variantBLOCKSLEFT) {
-      smallSquareCount -= 1;
-    field.innerHTML = smallSquareCount.toString();
-      
-    }
-    
   }
-  
-  /*
   function undo() {
     socket.send(JSON.stringify(makeFlagArray(6))); 
-  } 
-  */
+  }
       
   //generate random colors function
   function getRandomColor() {
@@ -744,6 +602,15 @@
     //need to return [segment, path, movepath]
     return [segment, path, movePath];
   }
+
+  
+  //
+  
+  
+  
+  
+  
+  
 
 </script>
 </html>
