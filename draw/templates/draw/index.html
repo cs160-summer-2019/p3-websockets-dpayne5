@@ -89,6 +89,7 @@
         text-align: center;
         color: #FFFFFF;
       }
+      
       .imageContainer {
         border: 2px solid green;
         margin-left: 30px;
@@ -97,28 +98,40 @@
         margin-top: 10px;
         justify-content: space-evenly;
       }
+      
       .dropdown {
         top: 200px;
         left: 150px;
       }
       
-      .open-model {
-        top: 500px;
-        right: 0px;
-        width:90px;
-        height:90px;
+      .open-ref {
+        position: absolute;
+        right: 0;
+        bottom: 50%;
+        width:60px;
+        height:60px;
+        background: rgba(255, 219, 207, 0.66);
+        transition: 0.3s;
+        border-radius: 15px;
+        backface-visibility: hidden;
+      }
+      
+      #ref  {
+        
+        display: none;
       }
       
     </style>
 
 </head>
 <body>
-  <div class="model-overlay">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeModel()"></a>
-  </div>
- <button class="open-model" onclick="openModel()">
-   <i class="fab fa-simplybuilt"></i>
+ <button class="open-ref">
+   <i class="fab fa-simplybuilt fa-2x"></i>
   </button>
+  
+  <div id="refImage">
+    
+  </div>
     <!-- You may change the dimensions of this canvas -->
     <canvas id="myCanvas"></canvas>
   
