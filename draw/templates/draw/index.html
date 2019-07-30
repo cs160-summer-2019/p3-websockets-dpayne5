@@ -23,7 +23,7 @@
     }
       #myCanvas {
         height: 700px;
-        width: 80%;
+        width: 95%;
         margin: 0 auto;
       }
       
@@ -60,12 +60,19 @@
       .buttonContainer {
         margin: 0 auto;
         /*margin-bottom: 20px;*/
-        width: 95%;
+        height: 80px;
+        width: 80%;
         display: flex;
         flex-direction: row;
         justify-content:space-around;
         /*margin-top: 20px;*/
         background: rgba(255, 219, 207, 0.66);
+        border: 1.5px solid #FFFFFF;
+        box-sizing: border-box;
+        border-radius: 18.2088px;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
       }
       
       .button {
@@ -74,11 +81,11 @@
         height: 51px;
         left: 1148px;
         top: 750px;
-
         background: #DACED9;
         border: 3px solid #BACDE9;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-        border-radius: 10px;     
+        border-radius: 10px;    
+        margin: 10px;
       }
       
       .legoText {
@@ -107,7 +114,7 @@
       .open-ref {
         position: absolute;
         right: 0;
-        bottom: 50%;
+        bottom: 60%;
         width:60px;
         height:60px;
         background: rgba(255, 219, 207, 0.66);
@@ -116,8 +123,23 @@
         backface-visibility: hidden;
       }
       
-      #ref  {
-        
+      #refImage  {
+          color: white;
+          position: absolute;
+          right:70px;
+          width: 709px;
+          height: 294px;
+          top: 30%;
+          background: rgba(238, 185, 185, 0.84);
+          border-radius: 15px;
+          border: 1px solid white;
+          padding: 10px;
+          border-radius: 10px;
+          font-family: "Segoe UI", Candara, "Bitstream Vera Sans", "DejaVu Sans", "Bitstream Vera Sans", "Trebuchet MS", Verdana, "Verdana Ref", sans-serif;
+          line-height: 100px;
+          text-align: center;
+          margin: auto;
+          display: none;
         display: none;
       }
       
@@ -130,7 +152,7 @@
   </button>
   
   <div id="refImage">
-    
+    <img src="http://legodiy.net/wp-content/uploads/2017/01/lego-plane.jpg" alt="Airplane overall" style="width:500px;height:270px;">
   </div>
     <!-- You may change the dimensions of this canvas -->
     <canvas id="myCanvas"></canvas>
@@ -188,8 +210,12 @@
 </body>
 
 <script>
+  
+  $(".open-ref").click(function() {
+    $('#refImage').animate({width: 'toggle'});
+  }) 
   //*** server is running HERE: http://p3-websockets-dpayne5-dpayne589733.codeanyapp.com:3000/draw/ *********
-
+  //Dusty ur the best ^^
   var allLEGOS = [];
   var canvas = document.getElementById('myCanvas');
   var socket = new WebSocket('wss://p3-websockets-dpayne5-dpayne589733.codeanyapp.com/ws/draw');
@@ -477,6 +503,10 @@
       case 1:
         var newLP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(400,50));
         newLP.fillColor = s[4];
+        newLP.shadowColor = '#bdad9d';
+        // Set the shadow blur radius to 12:
+        newLP.shadowBlur = '12',
+        newLP.shadowOffset = new paper.Point(3, 5);
         allLEGOS.push(newLP);
         console.log("total list of all blocks",allLEGOS)
         
@@ -486,6 +516,10 @@
         //do stuff
         var newMP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,50));
         newMP.fillColor = s[4];
+        newMP.shadowColor = '#bdad9d';
+        // Set the shadow blur radius to 12:
+        newMP.shadowBlur = '12',
+        newMP.shadowOffset = new paper.Point(3, 5);
         allLEGOS.push(newMP);
         
         break;
@@ -494,6 +528,10 @@
         //do stuff
         var newSP = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,50));
         newSP.fillColor = s[4];
+        newSP.shadowColor = '#bdad9d';
+        // Set the shadow blur radius to 12:
+        newSP.shadowBlur = '12',
+        newSP.shadowOffset = new paper.Point(3, 5);
         allLEGOS.push(newSP); 
         return newSP;
         break;
@@ -503,6 +541,10 @@
         var newLS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(200,200));
         allLEGOS.push(newLS);
         newLS.fillColor = s[4];
+        newLS.shadowColor = '#bdad9d';
+        // Set the shadow blur radius to 12:
+        newLS.shadowBlur = '12',
+        newLS.shadowOffset = new paper.Point(3, 5);
         return newLS;
         break;
         //making new SmallSquare
@@ -511,6 +553,10 @@
         var newSS = new paper.Path.Rectangle(new paper.Point(x,y), new paper.Size(100,100));
         allLEGOS.push(newSS);
         newSS.fillColor = s[4];
+        newSS.shadowColor = '#bdad9d';
+        // Set the shadow blur radius to 12:
+        newSS.shadowBlur = '12',
+        newSS.shadowOffset = new paper.Point(3, 5);
         return newSS;
         break;
         
