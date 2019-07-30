@@ -97,6 +97,10 @@
         color: #FFFFFF;
       }
       
+      .welcomeText {
+        font-family: 'Rubik', sans-serif;
+      }
+      
       .imageContainer {
         border: 2px solid green;
         margin-left: 30px;
@@ -124,7 +128,6 @@
       }
       
       #refImage  {
-          color: white;
           position: absolute;
           right:70px;
           width: 709px;
@@ -134,15 +137,47 @@
           border-radius: 15px;
           border: 1px solid white;
           padding: 10px;
-          border-radius: 10px;
-          font-family: "Segoe UI", Candara, "Bitstream Vera Sans", "DejaVu Sans", "Bitstream Vera Sans", "Trebuchet MS", Verdana, "Verdana Ref", sans-serif;
+          font-family: 'Rubik', sans-serif;
           line-height: 100px;
           text-align: center;
           margin: auto;
           display: none;
+      }
+      
+      .open-profile {
+        position:absolute;
+        left:0;
+        bottom: 60%;
+        width:60px;
+        height:60px;
+        background: rgba(255, 219, 207, 0.66);
+        transition: 0.3s;
+        border-radius: 15px;
+        backface-visibility: hidden;
+      }
+      
+      #profile {
+        position: absolute;
+        left:70px;
+        width: 709px;
+        height: 294px;
+        top: 30%;
+        background: rgba(238, 185, 185, 0.84);
+        border-radius: 15px;
+        font-family: 'Rubik', sans-serif;
+        border-radius: 15px;
+        border: 1px solid white;
+        padding: 10px;
+        line-height: 100px;
+        text-align: center;
+        margin: auto;
         display: none;
       }
       
+      .model-choices {
+        border-radius: 50%;
+        background: #FFF6C6;
+      }
     </style>
 
 </head>
@@ -150,9 +185,16 @@
  <button class="open-ref">
    <i class="fab fa-simplybuilt fa-2x"></i>
   </button>
-  
+<button class="open-profile">
+  <i class="far fa-smile-wink fa-2x"></i>
+  </button>
   <div id="refImage">
     <img src="http://legodiy.net/wp-content/uploads/2017/01/lego-plane.jpg" alt="Airplane overall" style="width:500px;height:270px;">
+  </div>
+  <div id="profile">
+    <p>
+      Hello, Billy. What do you want to build today? 
+    </p>
   </div>
     <!-- You may change the dimensions of this canvas -->
     <canvas id="myCanvas"></canvas>
@@ -214,6 +256,10 @@
   $(".open-ref").click(function() {
     $('#refImage').animate({width: 'toggle'});
   }) 
+  
+  $(".open-profile").click(function() {
+    $('#profile').animate({width: 'toggle'});
+  })
   //*** server is running HERE: http://p3-websockets-dpayne5-dpayne589733.codeanyapp.com:3000/draw/ *********
   //Dusty ur the best ^^
   var allLEGOS = [];
@@ -365,9 +411,7 @@
       segment.point += event.delta;
       path.smooth();
     }
-      
-      
-      
+ 
     else if (path) {
       
       
@@ -388,10 +432,6 @@
       socket.send(JSON.stringify(flag));
   }
   
-  
-  
-  
-  
   // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
   
@@ -405,14 +445,6 @@
     return flag;
   }
  
-  
-  
-  
-  
-  
-  
-  
-  
   function makeMouseDownSocketArray(event) {
     
     var test = "-1";
